@@ -33,7 +33,12 @@ public class AvatarMotion : MonoBehaviour
     void Update()
     {
         cup.gameObject.SetActive(Dining);tray.gameObject.SetActive(Carrying);
-        if(Frozen)return;
+        if(Frozen)
+        {
+            var face=GetComponent<AvatarExpression>();
+            if(face&&face.Speaking&&!Dining&&!Carrying){float talk=Mathf.Sin(Time.unscaledTime*2)*3;leftArm.localRotation=la*Quaternion.Euler(-8+talk,0,-4);rightArm.localRotation=ra*Quaternion.Euler(-14-talk,0,6);}
+            return;
+        }
         if(arriving||departing)
         {
             Vector3 delta=destination-transform.position;

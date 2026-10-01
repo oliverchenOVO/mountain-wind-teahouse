@@ -1,10 +1,19 @@
-# 山風茶屋 — Windows 可玩 Demo 0.9
+# 山風茶屋 — Windows 可玩 Demo 0.10
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV9/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV9 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV10/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV10 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.10 茶屋生活美術
+
+- 側邊雨傘架、三把收起的紙傘與雨天撐開的紙傘；小木架、茶罐標籤、點心盤、茶葉竹盤、摺好的布巾與薄荷盆栽。主要裝飾靜態合批，不新增碰撞體，不變更互動點 ID。
+- 雨天屋簷滴水、地面淡水痕與擴散水圈；晴天隱藏，手帳與設定暫停時保持靜止。這是風格化視覺，不是真實積水或倒影模擬，也不影響走路速度。
+- 現有分離網格增加眨眼、微笑曲線、點頭與好奇歪頭；對話時有輕微手臂動作。遊戲世界暫停時，只讓說話角色的小動作繼續。
+- 對話近照改成頭部／上半身構圖，說話時約每秒更新十次；非說話的肖像不每幀重繪。雨天茶故事採安心微笑，其他對話依角色顯示好奇、微笑或專注。
+- 手帳地圖改成讀取溪谷 NPC 當前位置，雨天移到茶屋後不再標在原處。
+- 不修改料理交易、好感、雨天事件獎勵、玩家存檔格式或 Blender 原始模型。仍非完整蒙皮骨架與表情變形系統。
 
 ## 0.9 茶屋介面與聲音設定
 
@@ -27,7 +36,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV9/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV10/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
@@ -154,6 +163,8 @@ Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Win
 - `Assets/Scripts/RainWeather.cs`：0.8 天氣循環、雨滴、遮棚、雨聲與三段避雨茶事件。
 - `Assets/Scripts/TeaUITheme.cs`：0.9 程式生成圓角紙卡、木框、茶杯印章、葉片與按鈕。
 - `Assets/Scripts/AudioSettings.cs`：0.9 四項音量、靜音、試聽、獨立設定存檔與驗證。
+- `Assets/Scripts/TeaLifeArt.cs`：0.10 茶屋擺設、紙傘、屋簷水滴與動態肖像控制。
+- `Assets/Scripts/AvatarExpression.cs`：0.10 分離網格眨眼、微笑與頭部小動作。
 - `Assets/Scripts/TeaHouseWorld.cs`：程序生成的溪谷、茶屋、森林、橋梁和場景材質。
 - `Assets/Scripts/MountainArt.cs`：0.2 的地形、茶屋、森林與環境細節。
 - `Assets/Scripts/AvatarMotion.cs`：分離肢體模型的簡單 FK 動作、入座與離席。
@@ -173,6 +184,7 @@ Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Win
 - `QAV7/`：巡路、筆記事件、音量衰減、存檔相容驗證與實際畫面。
 - `QAV8/`：天氣、事件交易、品質扣除、跨日恢復與雨天執行檔截圖（僅本機）。
 - `QAV9/`：音量設定、獨立保存、茶屋介面與實際畫面（僅本機）。
+- `QAV10/`：生活美術、雨天切換、表情與送餐走道驗證（僅本機）。
 
 命令列建置使用 Unity 的 `-batchmode -quit -projectPath <此資料夾> -executeMethod BuildDemo.Build`。
 

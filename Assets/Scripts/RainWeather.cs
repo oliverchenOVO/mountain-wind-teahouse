@@ -29,7 +29,7 @@ public partial class MountainTeaGame
     void SyncWeatherPeople()
     {
         if(valleyHomes==null)return;bool shelter=IsRainDay&&!data.night;
-        Vector3[] refuge={new Vector3(-16,0,-3.8f),new Vector3(-9,0,-3.8f),new Vector3(-7,0,-3.8f)};
+        Vector3[] refuge={new Vector3(-15.5f,0,-3.8f),new Vector3(-10.2f,0,-3.8f),new Vector3(-8.3f,0,-3.8f)};
         for(int i=0;i<3;i++)
         {
             var s=spots[i+1];Vector3 position=shelter?refuge[i]:valleyHomes[i];position.y=GroundHeight(position.x,position.z);s.pos=position;s.visual.transform.position=position;
@@ -77,7 +77,7 @@ public partial class MountainTeaGame
         string[] speakers={"河城荷取","射命丸文","犬走椛"};
         string[] lines={"雨一來，工坊的零件就得收好。\n你的屋簷剛好讓我停下來喘口氣。\n暖茶真舒服。等雨停了，再回去修水車吧。", "今天的新聞，是這間茶屋沒有趕走避雨的人。\n鏡頭沾了水，就先不拍了。\n有些山中日常，只用眼睛記住也很好。", "巡山時我會記下每一個能避雨的地方。\n現在，這間茶屋也在那份名單上。\n雨會停，燈還亮著。謝謝你的茶。"};
         data.journal.Add("第 "+data.day+" 天 · 避雨茶 "+(chapter+1)+"/3 · "+speakers[chapter]);
-        Say(speakers[chapter],lines[chapter]+"\n\n暖茶 −1 · 謝禮 ＋20 文"+(chapter==2?"\n《山雨時分》完成，故事已記入手帳。":""));rainDialogue=true;Play(chime);Save(false);return true;
+        Say(speakers[chapter],lines[chapter]+"\n\n暖茶 −1 · 謝禮 ＋20 文"+(chapter==2?"\n《山雨時分》完成，故事已記入手帳。":""));SetDialogueMood(1);rainDialogue=true;Play(chime);Save(false);return true;
     }
     void DrawRainHUD()
     {

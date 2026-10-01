@@ -33,6 +33,7 @@ public static class TeaHouseWorld
         }
         g.transform.localScale=Vector3.one*1.12f;
         g.AddComponent<AvatarMotion>();
+        g.AddComponent<AvatarExpression>();
         return g;
     }
     public static void Build()

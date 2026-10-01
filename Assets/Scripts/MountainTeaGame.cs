@@ -89,6 +89,7 @@ public partial class MountainTeaGame : MonoBehaviour
         musicSource=gameObject.AddComponent<AudioSource>();musicSource.clip=bgm;musicSource.loop=true;musicSource.volume=.12f;musicSource.Play();
         BuildLivingMountain();
         BuildRainWeather();
+        BuildTeaLife();
         CreatePortraits();
         LoadAudioPreferences();
         if(qa) StartCoroutine(QARun());
@@ -355,7 +356,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(success&&!data.trialDone){data.trialDone=true;data.money+=50;Notify("符卡練習通過 · ＋50 文！",6);Play(chime);Save(false);}
         else Notify(success?"再一次漂亮地避開了彈幕！":"練習結束。和椛說話就能再試，沒有懲罰。",5);
     }
-    void Say(string n,string words){rainDialogue=false;speaker=n;dialogue=words;modal=true;}
+    void Say(string n,string words){rainDialogue=false;speaker=n;dialogue=words;modal=true;SetDialogueMood(n=="河城荷取"?2:n=="犬走椛"?3:1);}
     void Notify(string words,float time=3){toast=words;toastTimer=time;}
     void Play(AudioClip c){if(audioSource&&c)audioSource.PlayOneShot(c);}
     public void Save(bool feedback=true)
@@ -432,9 +433,10 @@ public partial class MountainTeaGame : MonoBehaviour
         {
             Vector3 p=new Vector3(100+i*6,0,100);var model=TeaHouseWorld.Character(models[i],p);model.transform.rotation=Quaternion.Euler(0,180,0);
             foreach(var tr in model.GetComponentsInChildren<Transform>())tr.gameObject.layer=30;
-            var cameraObject=new GameObject("Portrait camera "+models[i]);var pc=cameraObject.AddComponent<Camera>();pc.enabled=false;pc.cullingMask=1<<30;pc.clearFlags=CameraClearFlags.SolidColor;pc.backgroundColor=new Color(.83f,.85f,.71f);pc.orthographic=true;pc.orthographicSize=1.22f;
-            pc.transform.position=p+new Vector3(0,1.35f,-5);pc.transform.LookAt(p+Vector3.up*1.35f);
+            var cameraObject=new GameObject("Portrait camera "+models[i]);var pc=cameraObject.AddComponent<Camera>();pc.enabled=false;pc.cullingMask=1<<30;pc.clearFlags=CameraClearFlags.SolidColor;pc.backgroundColor=new Color(.83f,.85f,.71f);pc.orthographic=true;pc.orthographicSize=.95f;
+            pc.transform.position=p+new Vector3(0,1.48f,-5);pc.transform.LookAt(p+Vector3.up*1.48f);
             var texture=new RenderTexture(256,256,16);texture.Create();pc.targetTexture=texture;pc.Render();portraits[names[i]]=texture;
+            portraitLife[names[i]]=new PortraitLife{camera=pc,face=model.GetComponent<AvatarExpression>()};
         }
     }
     void Portrait(string who,Rect rect)
@@ -473,7 +475,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.9",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.10",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -571,6 +573,7 @@ public partial class MountainTeaGame : MonoBehaviour
         Text(367,346,706,40,speaker,heading);Box(new Rect(367,395,706,2),gold);
         bool hasPortrait=portraits.ContainsKey(speaker);
         if(hasPortrait)Portrait(speaker,new Rect(368,418,124,142));
+        if(hasPortrait)TeaTag(new Rect(925,349,150,30),dialogueMood==1?"安心微笑":dialogueMood==2?"好奇傾聽":dialogueMood==3?"認真巡查":"山中日常",sage);
         Text(hasPortrait?515:367,415,hasPortrait?560:706,170,dialogue,body);
         if(rainDialogue){if(Button(730,633,345,"收好茶杯 [Esc]")){modal=false;speaker="";rainDialogue=false;}return;}
         if(storyGuest>=0){if(Button(365,633,350,"謝謝消息，結帳送客"))FinishStory();}
@@ -612,7 +615,7 @@ public partial class MountainTeaGame : MonoBehaviour
         Box(new Rect(map.x+326,map.y,38,map.height),new Color(.36f,.64f,.66f));
         Box(new Rect(map.x,map.y+230,map.width,16),new Color(.70f,.59f,.40f));
         Box(new Rect(map.x+320,map.y+66,48,16),woodColor());
-        MapPin(map,new Vector3(-12,0,-2),"茶屋");MapPin(map,new Vector3(13,0,-2),"荷取");MapPin(map,new Vector3(-3,0,6),"文");MapPin(map,new Vector3(16,0,12),"椛");MapPin(map,new Vector3(5,0,-11),"釣點");MapPin(map,player.position,"你",true);
+        MapPin(map,spots[0].pos,"茶屋");MapPin(map,spots[1].pos,"荷取");MapPin(map,spots[2].pos,"文");MapPin(map,spots[3].pos,"椛");MapPin(map,spots[4].pos,"釣點");MapPin(map,player.position,"你",true);
         Text(210,663,490,48,"北邊與中央都有橋。採集物每天更新。\n清茶、菇飯都能替代客人點的料理。",small);
         Text(760,224,430,40,"料理與委託",heading);
         if(Button(210,715,490,"山中友人 · 好感與故事 · 消息手帳")){notebook=false;relationships=true;}
@@ -725,7 +728,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -789,6 +792,10 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(2);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"25-rain-teahouse.png"));
         yield return new WaitForSeconds(.5f);player.position=new Vector3(-12,0,-3);ServeRainTea();
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"26-rain-story.png"));
+        yield return new WaitForSeconds(.5f);modal=false;photoMode=true;player.position=new Vector3(-14.5f,0,-4.6f);cam.transform.position=player.position+CameraOffset;cam.orthographicSize=9;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"29-tea-house-life.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;Say("射命丸文","雨聲剛好蓋過山路的喧鬧。\n今天就留在茶屋，慢慢喝完這杯茶吧。");SetDialogueMood(1);
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"30-aya-expression.png"));
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
