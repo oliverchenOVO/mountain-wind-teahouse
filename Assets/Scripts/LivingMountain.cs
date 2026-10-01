@@ -44,7 +44,7 @@ public partial class MountainTeaGame
     static float AmbientGain(float distance,float radius){float t=Mathf.Clamp01(1-distance/radius);return t*t;}
     void UpdateMountainAudio(float dt)
     {
-        if(!windAudio)return;float active=started?1:0;
+        if(!windAudio)return;float active=started?AmbienceVolumeGain:0;
         windAudio.volume=Mathf.Lerp(windAudio.volume,active*.2f,dt*3);
         float riverDistance=data.onTrail?Mathf.Abs(player.position.x-98):Mathf.Abs(player.position.x-8);
         streamAudio.volume=Mathf.Lerp(streamAudio.volume,active*.55f*AmbientGain(riverDistance,13),dt*3);

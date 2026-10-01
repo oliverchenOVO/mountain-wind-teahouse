@@ -41,7 +41,7 @@ public partial class MountainTeaGame
     void TickRainWeather(float dt)
     {
         if(!rainDrops)return;SyncWeatherPeople();bool wet=started&&IsRainDay;
-        float volume=wet?(Sheltered(player.position)?.22f:.42f):0;
+        float volume=wet?(Sheltered(player.position)?.22f:.42f)*AmbienceVolumeGain:0;
         rainAudio.volume=Mathf.Lerp(rainAudio.volume,volume,1-Mathf.Exp(-dt*3));
         weatherBlend=Mathf.Lerp(weatherBlend,wet?1:0,1-Mathf.Exp(-dt*3));
         float evening=data.night?1:Mathf.Clamp01(data.clock/360)*.45f;
@@ -50,7 +50,10 @@ public partial class MountainTeaGame
         RenderSettings.ambientLight=Color.Lerp(Color.Lerp(new Color(.62f,.7f,.62f),new Color(.32f,.39f,.47f),evening),data.night?new Color(.3f,.36f,.43f):new Color(.48f,.55f,.61f),weatherBlend);
         cam.backgroundColor=Color.Lerp(new Color(.69f,.77f,.66f),new Color(.56f,.63f,.68f),weatherBlend);RenderSettings.fogColor=cam.backgroundColor;
         if(!wet){if(rainDrops.particleCount>0)rainDrops.Clear();rainAccumulator=0;return;}
-        if(AvatarMotion.Frozen){if(!rainDrops.isPaused)rainDrops.Pause();return;}
+        // Keep the particle system updating while freezing simulation time.
+        // This avoids parking particle jobs throughout long settings sessions.
+        var rainMain=rainDrops.main;rainMain.simulationSpeed=AvatarMotion.Frozen?0:1;
+        if(AvatarMotion.Frozen)return;
         if(rainDrops.isPaused)rainDrops.Play();
         rainAccumulator+=dt*280;
         while(rainAccumulator>=1)
@@ -78,7 +81,7 @@ public partial class MountainTeaGame
     }
     void DrawRainHUD()
     {
-        Text(990,211,415,30,"天氣："+(IsRainDay?"山雨":"晴朗")+" · 明日："+((data.day+1)%3==0?"山雨":"晴朗"),small);
+        TeaTag(new Rect(980,205,435,32),"天氣："+(IsRainDay?"山雨":"晴朗")+" · 明日："+((data.day+1)%3==0?"山雨":"晴朗"),sage);
         if(!IsRainDay||data.night)return;
         Panel(new Rect(980,253,435,190));Text(1000,265,390,35,"茶屋避雨 · "+Mathf.Clamp(data.rainStoryStage,0,3)+" / 3",heading);
         Text(1000,307,390,68,data.rainStoryStage>=3?"三杯茶，三段山中日常。\n你可以繼續探索、備餐與營業。":"回茶屋料理台附近，備好清茶或竹葉茶。\n每段消耗一杯茶，謝禮 20 文。",small);

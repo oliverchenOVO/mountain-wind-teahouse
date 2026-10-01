@@ -86,10 +86,11 @@ public partial class MountainTeaGame : MonoBehaviour
         BuildMountainTrip();
         audioSource=gameObject.AddComponent<AudioSource>();audioSource.volume=.28f;
         chime=Tone(660,.24f);pickupSound=Tone(880,.12f);bgm=Music();
-        var music=gameObject.AddComponent<AudioSource>();music.clip=bgm;music.loop=true;music.volume=.12f;music.Play();
+        musicSource=gameObject.AddComponent<AudioSource>();musicSource.clip=bgm;musicSource.loop=true;musicSource.volume=.12f;musicSource.Play();
         BuildLivingMountain();
         BuildRainWeather();
         CreatePortraits();
+        LoadAudioPreferences();
         if(qa) StartCoroutine(QARun());
     }
     void AddSpot(string n,Vector3 p,int kind,string character=null)
@@ -121,10 +122,12 @@ public partial class MountainTeaGame : MonoBehaviour
     {
         if(playerMotion)playerMotion.Walking=false;
         if(toastTimer>0) toastTimer-=Time.deltaTime;
+        if(saveBadgeTimer>0)saveBadgeTimer-=Time.deltaTime;
         if(started&&Input.GetKeyDown(KeyCode.F8))photoMode=!photoMode;
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            if(fishing){fishing=false;Notify("收起釣竿。");}
+            if(settingsOpen){CloseAudioSettings();}
+            else if(fishing){fishing=false;Notify("收起釣竿。");}
             else if(brewing){brewing=false;Notify("已取消，材料沒有消耗。");}
             else if(modal){if(storyGuest>=0)FinishStory();else {modal=false;speaker="";eventFriend=-1;}}
             else if(relationships){relationships=false;notebook=true;}
@@ -134,9 +137,9 @@ public partial class MountainTeaGame : MonoBehaviour
             else if(started&&!result) paused=!paused;
         }
         if(started&&!paused&&!modal&&!result&&!brewing&&Input.GetKeyDown(KeyCode.Tab)){if(travelBook){travelBook=false;notebook=true;}else if(planning){Save(false);planning=false;notebook=true;}else if(relationships){relationships=false;notebook=true;}else notebook=!notebook;return;}
-        AvatarMotion.Frozen=!started||paused||notebook||modal||result||brewing||relationships||planning||travelBook;
+        AvatarMotion.Frozen=!started||paused||notebook||modal||result||brewing||relationships||planning||travelBook||settingsOpen;
         if(brewing){brewTimer+=Time.deltaTime;if(Input.GetKeyDown(KeyCode.Space))FinishBrew();return;}
-        if(!started||paused||notebook||modal||result||relationships||planning||travelBook) return;
+        if(!started||paused||notebook||modal||result||relationships||planning||travelBook||settingsOpen) return;
         if(Input.GetKeyDown(KeyCode.F5)) Save();
         if(fishing)
         {
@@ -366,7 +369,7 @@ public partial class MountainTeaGame : MonoBehaviour
             string target=qa?Path.Combine(qaDir,"qa-save.json"):savePath;
             string temporary=target+".tmp";File.WriteAllText(temporary,JsonUtility.ToJson(data,true));
             if(File.Exists(target))File.Copy(target,target+".bak",true);
-            File.Copy(temporary,target,true);File.Delete(temporary);if(feedback)Notify("已儲存 · 第 "+data.day+" 天");
+            File.Copy(temporary,target,true);File.Delete(temporary);saveBadgeTimer=2.8f;if(feedback)Notify("已儲存 · 第 "+data.day+" 天");
         }
         catch(Exception e){Debug.LogError("Save failed: "+e.Message);Notify("存檔失敗，請確認資料夾可寫入。",6);}
     }
@@ -398,7 +401,7 @@ public partial class MountainTeaGame : MonoBehaviour
         SyncTrip();
         Say("山風茶屋 · 第一天","你接手了妖怪之山腳的一間舊茶屋。\n先按 WASD 探索，靠近茶葉、香菇和竹筍按 E 採集。\n過橋找荷取接委託；在溪邊釣魚；回料理台準備晚餐。\n第一個目標：賺到 180 文，修好茶屋招牌。\n按 Tab 隨時查看地圖與食譜，Esc 暫停。對話與手帳會暫停時間。");
     }
-    void OnApplicationQuit(){Save(false);}
+    void OnApplicationQuit(){Save(false);SaveAudioPreferences();}
     IEnumerator QuitAfterEffects()
     {
         if(closing)yield break;closing=true;Save(false);
@@ -416,6 +419,7 @@ public partial class MountainTeaGame : MonoBehaviour
         travelBook=false;
         photoMode=false;
         rainDialogue=false;
+        settingsOpen=false;
     }
     void ReturnMenu()
     {
@@ -435,7 +439,7 @@ public partial class MountainTeaGame : MonoBehaviour
     }
     void Portrait(string who,Rect rect)
     {
-        if(portraits.TryGetValue(who,out var texture)){Box(new Rect(rect.x-2,rect.y-2,rect.width+4,rect.height+4),gold);GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit);}
+        if(portraits.TryGetValue(who,out var texture)){RoundFill(new Rect(rect.x-6,rect.y-6,rect.width+12,rect.height+12),gold);GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit);}
     }
 
     void InitStyles()
@@ -443,27 +447,23 @@ public partial class MountainTeaGame : MonoBehaviour
         if(stylesReady)return;stylesReady=true;
         title=Style(48,FontStyle.Bold,ink);heading=Style(26,FontStyle.Bold,ink);body=Style(21,FontStyle.Normal,ink);small=Style(17,FontStyle.Normal,ink);label=Style(18,FontStyle.Bold,cream);
         label.alignment=TextAnchor.MiddleCenter;
-        button=Style(19,FontStyle.Bold,cream);button.alignment=TextAnchor.MiddleCenter;button.normal.background=Texture2D.whiteTexture;button.hover.background=Texture2D.whiteTexture;button.active.background=Texture2D.whiteTexture;
+        button=Style(19,FontStyle.Bold,cream);button.alignment=TextAnchor.MiddleCenter;
         button.hover.textColor=new Color(1,.88f,.53f);
         paper=new Texture2D(128,128);var colors=new Color[128*128];
         for(int y=0;y<128;y++)for(int x=0;x<128;x++){float n=Mathf.PerlinNoise(x*.47f,y*.47f)*.025f;colors[y*128+x]=new Color(cream.r-n,cream.g-n,cream.b-n,1);}
         paper.SetPixels(colors);paper.Apply();
+        InitTeaTheme();
     }
     GUIStyle Style(int size,FontStyle weight,Color color){return new GUIStyle{font=font,fontSize=size,fontStyle=weight,normal={textColor=color},wordWrap=true};}
     void Box(Rect r,Color c){Color old=GUI.color;GUI.color=c;GUI.DrawTexture(r,Texture2D.whiteTexture);GUI.color=old;}
     void Panel(Rect r)
     {
-        Box(new Rect(r.x+4,r.y+6,r.width,r.height),new Color(.10f,.18f,.13f,.2f));
-        Box(new Rect(r.x-1,r.y-1,r.width+2,r.height+2),new Color(.52f,.53f,.37f,.9f));
-        GUI.DrawTexture(r,paper,ScaleMode.StretchToFill);
-        Box(new Rect(r.x+7,r.y+7,16,2),gold);Box(new Rect(r.x+7,r.y+7,2,16),gold);
-        Box(new Rect(r.xMax-23,r.yMax-9,16,2),gold);Box(new Rect(r.xMax-9,r.yMax-23,2,16),gold);
+        TeaPanel(r);
     }
     void Text(float x,float y,float w,float h,string s,GUIStyle style=null){GUI.Label(new Rect(x,y,w,h),s,style??body);}
     bool Button(float x,float y,float w,string text,bool enabled=true,Color? color=null)
     {
-        bool previous=GUI.enabled;GUI.enabled=previous&&enabled;Color old=GUI.backgroundColor;GUI.backgroundColor=color??sage;
-        bool clicked=GUI.Button(new Rect(x,y,w,43),text,button);GUI.backgroundColor=old;GUI.enabled=previous;return clicked;
+        return TeaButton(new Rect(x,y,w,43),text,enabled,color??sage);
     }
     void OnGUI()
     {
@@ -472,8 +472,8 @@ public partial class MountainTeaGame : MonoBehaviour
         GUI.matrix=Matrix4x4.TRS(new Vector3(ox,oy,0),Quaternion.identity,new Vector3(scale,scale,1));
         if(!started)
         {
-            GUI.enabled=!modal;
-            Panel(new Rect(70,105,565,670));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.8",small);
+            GUI.enabled=!modal&&!settingsOpen;
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.9",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -484,7 +484,8 @@ public partial class MountainTeaGame : MonoBehaviour
             if(Button(110,570,455,"繼續旅程",File.Exists(savePath)))Load();
             if(Button(110,625,220,"關於這個 Demo"))credits=!credits;
             if(Button(345,625,220,"離開遊戲"))StartCoroutine(QuitAfterEffects());
-            Text(110,694,460,50,"WASD 移動 · E 互動 · Tab 手帳 · Esc 暫停",small);
+            if(Button(110,682,455,"聲音設定 · 調整山中的聲音"))settingsOpen=true;
+            Text(110,745,460,45,"WASD 移動 · E 互動 · Tab 手帳 · Esc 暫停",small);
             if(credits){Panel(new Rect(700,220,660,390));Text(730,250,600,270,"東方 Project 非官方二次創作 Demo\n原作：上海アリス幻樂団 / ZUN\n\n人物：原創旅人、河城荷取、射命丸文、犬走椛\n本作角色模型由 Blender 程式建立，音樂為程式合成的原創旋律。\n目前包含一個溪谷、兩輪營業客人、委託、釣魚和符卡練習。\n本 Demo 的故事與對話是二次創作。",body);}
             GUI.enabled=true;
         }
@@ -499,19 +500,20 @@ public partial class MountainTeaGame : MonoBehaviour
             if(relationships)DrawRelationships();
             if(planning)DrawPlanning();
             if(travelBook)DrawTravelBook();
-            if(paused)DrawPause();
+            if(paused){GUI.enabled=!settingsOpen;DrawPause();GUI.enabled=true;}
             if(result)DrawResult();
             DrawCafeOverlay();
         }
+        if(settingsOpen)DrawAudioSettings();
         if(modal)DrawDialog();
-        if(toastTimer>0){Box(new Rect(370,800,700,55),new Color(.12f,.22f,.19f,.95f));Text(390,816,660,38,toast,label);}
+        if(toastTimer>0){RoundFill(new Rect(370,790,700,55),new Color(.12f,.22f,.19f,.95f));Text(390,801,660,38,toast,label);}
     }
     void DrawHUD()
     {
-        Panel(new Rect(25,25,450,83));Text(45,36,410,38,"山風茶屋   ·   "+(IsRainDay?"山雨時分":"晴日山風"),heading);
+        Panel(new Rect(25,25,450,93));TeaSeal(new Rect(44,43,53,53));Text(111,37,344,35,"山風茶屋 · "+(IsRainDay?"山雨時分":"晴日山風"),heading);
         DrawRainHUD();
         int minutes=9*60+Mathf.FloorToInt(data.clock/360*9*60);
-        Text(45,76,410,28,"第 "+data.day+" 天  ·  "+(data.night?"18:00  營業中":(minutes/60).ToString("00")+":"+(minutes%60).ToString("00"))+"  ·  "+data.money+" 文",small);
+        Text(111,77,340,28,"第 "+data.day+" 天 · "+(data.night?"18:00 營業中":(minutes/60).ToString("00")+":"+(minutes%60).ToString("00"))+" · "+data.money+" 文",small);
         Panel(new Rect(980,25,435,110));Text(1000,37,395,30,"材料  茶葉 "+data.leaves+" · 菇 "+data.mushrooms+" · 筍 "+data.bamboo+" · 魚 "+data.fish,small);
         Text(1000,75,395,55,"料理  清茶 "+data.tea+" · 菇飯 "+data.meal+" · 鹽燒 "+data.grilled+"\n香菇湯 "+data.soup+" · 竹葉茶 "+data.leafTea,small);
         if(Button(980,150,205,"手帳 [Tab]"))notebook=true;
@@ -521,11 +523,13 @@ public partial class MountainTeaGame : MonoBehaviour
         if(data.notebookStage>0&&data.notebookStage<6){Panel(new Rect(25,455,330,135));Text(42,468,298,30,"巡山筆記 · 下一步",heading);Text(42,511,298,72,NotebookHint(),small);}
         Panel(new Rect(25,125,285,155));Text(45,141,250,36,data.onTrail?"山路小旅行":data.restored?"山中友人的日常":"今天的小目標",heading);
         Text(45,186,245,78,data.onTrail?LunchStatus()+"\n採集山栗與野莓\n尋找瀑布觀景亭":data.restored?"招待料理提升好感\n白天拜訪，推進角色故事\nTab 查看故事與解鎖獎勵":!data.questDone?"過橋找荷取，收集 4 份竹筍\n備餐 → 開店 → 修繕招牌":"荷取委託完成 ✓\n營業與角色故事可一起推進",small);
-        Box(new Rect(25,838,470,39),new Color(.12f,.22f,.19f,.9f));Text(37,848,446,30,"WASD 移動 · Shift 跑步 · E 互動 · 滾輪縮放",label);
+        TeaTag(new Rect(25,840,540,36),"WASD 移動 · Shift 跑步 · E 互動 · 滾輪縮放",new Color(.12f,.22f,.19f,.92f));
+        if(saveBadgeTimer>0)TeaTag(new Rect(1220,842,190,34),"進度已保存",sage);
     }
     void DrawWorldLabels(float scale,float ox,float oy)
     {
-        foreach(var s in spots)
+        var labelRects=new List<Rect>();var sorted=new List<Spot>(spots);sorted.Sort((a,b)=>Vector3.SqrMagnitude(player.position-a.pos).CompareTo(Vector3.SqrMagnitude(player.position-b.pos)));
+        foreach(var s in sorted)
         {
             if(!VisibleLivingSpot(s)||(s.kind==23||s.kind==24)&&data.harvested.Contains(s.id))continue;
             if(data.night&&s.kind>=11&&s.kind<=13)continue;
@@ -535,11 +539,15 @@ public partial class MountainTeaGame : MonoBehaviour
             if(sp.z<0)continue;
             float x=(sp.x-ox)/scale,y=(Screen.height-sp.y-oy)/scale;
             if(x<80||x>1350||y<110||y>780)continue;
-            if(x<455&&y<315)continue;
-            if(x>960&&y<205)continue;
+            if(x<495&&y<330)continue;
+            if(x<375&&y>435&&y<610&&data.notebookStage>0&&data.notebookStage<6)continue;
+            if(x>940&&y<(IsRainDay&&!data.night?470:245))continue;
             if(data.night&&x>860&&y>320)continue;
-            if(s==nearest){Box(new Rect(x-105,y-15,210,34),sage);Text(x-100,y-10,200,30,"[E] "+s.name,label);}
-            else if(s.kind>=10){Box(new Rect(x-82,y-12,164,28),new Color(.15f,.23f,.20f,.8f));Text(x-78,y-10,156,28,s.name,label);}
+            bool actor=s.kind>=11&&s.kind<=13||s.kind==22||s.kind==26||s.kind==27;
+            if(s!=nearest&&(!actor||Vector3.Distance(player.position,s.pos)>7))continue;
+            Rect tag=new Rect(x-(s==nearest?105:82),y-15,s==nearest?210:164,34);bool overlap=false;
+            foreach(var used in labelRects)if(new Rect(used.x-8,used.y-8,used.width+16,used.height+16).Overlaps(tag)){overlap=true;break;}if(overlap)continue;
+            labelRects.Add(tag);TeaTag(tag,s==nearest?"[E] "+s.name:s.name,s==nearest?sage:new Color(.15f,.23f,.20f,.85f));
         }
     }
     void DrawGuests()
@@ -620,12 +628,13 @@ public partial class MountainTeaGame : MonoBehaviour
     }
     void DrawPause()
     {
-        Box(new Rect(0,0,1440,900),new Color(0,0,0,.4f));Panel(new Rect(475,220,490,430));Text(510,250,420,45,"稍作歇息",heading);
+        Box(new Rect(0,0,1440,900),new Color(0,0,0,.4f));Panel(new Rect(475,195,490,525));TeaSeal(new Rect(830,218,60,60));Text(510,250,310,45,"稍作歇息",heading);
         if(Button(515,322,410,"繼續旅程 [Esc]"))paused=false;
         if(Button(515,380,410,"儲存進度 [F5]"))Save();
-        if(Button(515,438,410,"儲存並回主選單"))ReturnMenu();
-        if(Button(515,496,410,"儲存並離開"))StartCoroutine(QuitAfterEffects());
-        Text(515,569,410,45,"每 20 秒、採集與交易後會自動存檔。",small);
+        if(Button(515,438,410,"聲音設定"))settingsOpen=true;
+        if(Button(515,496,410,"儲存並回主選單"))ReturnMenu();
+        if(Button(515,554,410,"儲存並離開"))StartCoroutine(QuitAfterEffects());
+        Text(515,631,410,55,"每 20 秒、採集與交易後會自動存檔。\n右下紙籤會提示保存完成。",small);
     }
     void DrawResult()
     {
@@ -716,7 +725,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -780,7 +789,13 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(2);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"25-rain-teahouse.png"));
         yield return new WaitForSeconds(.5f);player.position=new Vector3(-12,0,-3);ServeRainTea();
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"26-rain-story.png"));
-        yield return new WaitForSeconds(.5f);modal=false;data.day=1;started=false;toastTimer=0;player.position=new Vector3(-10,0,-4);cam.transform.position=player.position+CameraOffset;
+        yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"28-settings-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(.5f);CloseAudioSettings();paused=false;data.day=1;started=false;toastTimer=0;player.position=new Vector3(-10,0,-4);cam.transform.position=player.position+CameraOffset;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"05-title.png"));
         yield return new WaitForSeconds(1);
         float fps=(Time.frameCount-firstFrame)/(Time.realtimeSinceStartup-firstTime);Debug.Log("QA render average (includes captures): "+fps.ToString("F1")+" fps");

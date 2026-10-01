@@ -1,10 +1,18 @@
-# 山風茶屋 — Windows 可玩 Demo 0.8
+# 山風茶屋 — Windows 可玩 Demo 0.9
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV8/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV8 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV9/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV9 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.9 茶屋介面與聲音設定
+
+- 主要面板改成圓角木框、米色紙卡、柔和陰影與葉片印記；按鈕改成圓邊紙籤，提示與角色名稱採膠囊形標籤。茶杯印章出現在主選單、時鐘、暫停與設定頁。
+- 主選單與 Esc 暫停頁皆可開啟聲音設定。總音量、音樂、風雨溪流、互動腳步四項可分別調整，另有全部靜音、試聽提示音與恢復預設。
+- 調整立即生效，關閉或退出時保存至遊戲存檔旁的 `audio-settings.json`；不更改角色進度。從暫停頁開啟時，關閉設定後仍停在暫停頁，按 Esc 或「繼續旅程」回遊戲。
+- 場景標籤依距離排序，優先保留目前互動目標；隱藏過遠或重疊的非必要標籤，並避開主要 HUD 區域。右下會短暫顯示「進度已保存」。
+- 介面仍採程式生成的 Unity IMGUI，不是外部圖片或完整 UI Toolkit 移植；地圖與進度條仍保留清楚的幾何圖形。
 
 ## 0.8 山雨時分
 
@@ -19,7 +27,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV8/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV9/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
@@ -144,6 +152,8 @@ Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Win
 - `Assets/Scripts/TrailArt.cs`：0.6.1 山路、岩石、瀑布、植被與亭舍細節。
 - `Assets/Scripts/LivingMountain.cs`：0.7 日常巡路、筆記事件、距離環境聲與互動標記。
 - `Assets/Scripts/RainWeather.cs`：0.8 天氣循環、雨滴、遮棚、雨聲與三段避雨茶事件。
+- `Assets/Scripts/TeaUITheme.cs`：0.9 程式生成圓角紙卡、木框、茶杯印章、葉片與按鈕。
+- `Assets/Scripts/AudioSettings.cs`：0.9 四項音量、靜音、試聽、獨立設定存檔與驗證。
 - `Assets/Scripts/TeaHouseWorld.cs`：程序生成的溪谷、茶屋、森林、橋梁和場景材質。
 - `Assets/Scripts/MountainArt.cs`：0.2 的地形、茶屋、森林與環境細節。
 - `Assets/Scripts/AvatarMotion.cs`：分離肢體模型的簡單 FK 動作、入座與離席。
@@ -162,6 +172,7 @@ Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Win
 - `QAV61/`：美術更新後完整流程驗證與含 HUD／無 HUD 實際畫面。
 - `QAV7/`：巡路、筆記事件、音量衰減、存檔相容驗證與實際畫面。
 - `QAV8/`：天氣、事件交易、品質扣除、跨日恢復與雨天執行檔截圖（僅本機）。
+- `QAV9/`：音量設定、獨立保存、茶屋介面與實際畫面（僅本機）。
 
 命令列建置使用 Unity 的 `-batchmode -quit -projectPath <此資料夾> -executeMethod BuildDemo.Build`。
 
