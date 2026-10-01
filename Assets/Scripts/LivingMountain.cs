@@ -76,6 +76,11 @@ public partial class MountainTeaGame
             var s=spots.Find(t=>t.kind==routineKinds[i]);var r=data.routines[i];var motion=s.visual.GetComponent<AvatarMotion>();motion.Walking=false;
             Vector3 facing=player.position-s.pos;facing.y=0;
             if(facing.sqrMagnitude<9){if(facing.sqrMagnitude>.01f)s.visual.transform.rotation=Quaternion.Slerp(s.visual.transform.rotation,Quaternion.LookRotation(facing),dt*4);continue;}
+            if(IsRainDay)
+            {
+                Vector3 refuge=i==0?TP(86,20):i==1?TP(105,20):TP(107,20);Vector3 nextPosition=Vector3.MoveTowards(s.pos,refuge,dt*1.15f);
+                if(TrailWalkable(nextPosition)){Vector3 shelterDirection=nextPosition-s.pos;shelterDirection.y=0;r.x=nextPosition.x;r.z=nextPosition.z;ApplyRoutine(i);motion.Walking=shelterDirection.sqrMagnitude>.00001f;if(motion.Walking)s.visual.transform.rotation=Quaternion.LookRotation(shelterDirection);}continue;
+            }
             if(r.wait>0){r.wait-=dt;if(r.wait<=0)r.node=(r.node+1)%paths[i].Length;continue;}
             Vector2 current=new Vector2(r.x,r.z),next=Vector2.MoveTowards(current,paths[i][r.node],dt*1.15f);
             if(TrailWalkable(TP(next.x,next.y))){r.x=next.x;r.z=next.y;ApplyRoutine(i);motion.Walking=next!=current;}

@@ -18,6 +18,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public bool onTrail,trailVisited,trailRecipes,lunchPerfect,photoVisited,waterVisited,lookoutVisited;
         public int lunchState,lunchDay,deliveries,chestnuts,berries,chestnutRice,berryTea,qualityChestnutRice,qualityBerryTea;
         public int notebookStage,routineDay;public List<RoutineState> routines;
+        public int rainStoryStage;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -87,6 +88,7 @@ public partial class MountainTeaGame : MonoBehaviour
         chime=Tone(660,.24f);pickupSound=Tone(880,.12f);bgm=Music();
         var music=gameObject.AddComponent<AudioSource>();music.clip=bgm;music.loop=true;music.volume=.12f;music.Play();
         BuildLivingMountain();
+        BuildRainWeather();
         CreatePortraits();
         if(qa) StartCoroutine(QARun());
     }
@@ -350,7 +352,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(success&&!data.trialDone){data.trialDone=true;data.money+=50;Notify("符卡練習通過 · ＋50 文！",6);Play(chime);Save(false);}
         else Notify(success?"再一次漂亮地避開了彈幕！":"練習結束。和椛說話就能再試，沒有懲罰。",5);
     }
-    void Say(string n,string words){speaker=n;dialogue=words;modal=true;}
+    void Say(string n,string words){rainDialogue=false;speaker=n;dialogue=words;modal=true;}
     void Notify(string words,float time=3){toast=words;toastTimer=time;}
     void Play(AudioClip c){if(audioSource&&c)audioSource.PlayOneShot(c);}
     public void Save(bool feedback=true)
@@ -413,6 +415,7 @@ public partial class MountainTeaGame : MonoBehaviour
         planning=false;guestTarget=0;
         travelBook=false;
         photoMode=false;
+        rainDialogue=false;
     }
     void ReturnMenu()
     {
@@ -470,7 +473,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal;
-            Panel(new Rect(70,105,565,670));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.7",small);
+            Panel(new Rect(70,105,565,670));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.8",small);
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -505,7 +508,8 @@ public partial class MountainTeaGame : MonoBehaviour
     }
     void DrawHUD()
     {
-        Panel(new Rect(25,25,450,83));Text(45,36,310,38,"山風茶屋   ·   溪谷日常",heading);
+        Panel(new Rect(25,25,450,83));Text(45,36,410,38,"山風茶屋   ·   "+(IsRainDay?"山雨時分":"晴日山風"),heading);
+        DrawRainHUD();
         int minutes=9*60+Mathf.FloorToInt(data.clock/360*9*60);
         Text(45,76,410,28,"第 "+data.day+" 天  ·  "+(data.night?"18:00  營業中":(minutes/60).ToString("00")+":"+(minutes%60).ToString("00"))+"  ·  "+data.money+" 文",small);
         Panel(new Rect(980,25,435,110));Text(1000,37,395,30,"材料  茶葉 "+data.leaves+" · 菇 "+data.mushrooms+" · 筍 "+data.bamboo+" · 魚 "+data.fish,small);
@@ -560,6 +564,7 @@ public partial class MountainTeaGame : MonoBehaviour
         bool hasPortrait=portraits.ContainsKey(speaker);
         if(hasPortrait)Portrait(speaker,new Rect(368,418,124,142));
         Text(hasPortrait?515:367,415,hasPortrait?560:706,170,dialogue,body);
+        if(rainDialogue){if(Button(730,633,345,"收好茶杯 [Esc]")){modal=false;speaker="";rainDialogue=false;}return;}
         if(storyGuest>=0){if(Button(365,633,350,"謝謝消息，結帳送客"))FinishStory();}
         else if(eventFriend>=0){int current=eventFriend;if(Button(365,633,350,Friendship(current).stage==1?"交付食材，繼續故事":"繼續故事",EventReady(current)&&EventMaterials(current)))CompleteFriendEvent(current);}
         else if(speaker=="茶屋料理台")
@@ -711,7 +716,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -771,7 +776,11 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"06-waterfall.png"));
         yield return new WaitForSeconds(.5f);Say("河城荷取","水車轉起來啦！\n山風茶屋今天也好好營業吧。");
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"07-character-dialogue.png"));
-        yield return new WaitForSeconds(.5f);started=false;modal=false;toastTimer=0;player.position=new Vector3(-10,0,-4);cam.transform.position=player.position+CameraOffset;
+        yield return new WaitForSeconds(.5f);modal=false;result=false;data.day=3;data.night=false;data.clock=0;data.tea=3;data.rainStoryStage=0;player.position=new Vector3(-12,0,-6);cam.transform.position=player.position+CameraOffset;SyncWeatherPeople();toastTimer=0;
+        yield return new WaitForSeconds(2);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"25-rain-teahouse.png"));
+        yield return new WaitForSeconds(.5f);player.position=new Vector3(-12,0,-3);ServeRainTea();
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"26-rain-story.png"));
+        yield return new WaitForSeconds(.5f);modal=false;data.day=1;started=false;toastTimer=0;player.position=new Vector3(-10,0,-4);cam.transform.position=player.position+CameraOffset;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"05-title.png"));
         yield return new WaitForSeconds(1);
         float fps=(Time.frameCount-firstFrame)/(Time.realtimeSinceStartup-firstTime);Debug.Log("QA render average (includes captures): "+fps.ToString("F1")+" fps");

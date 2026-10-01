@@ -1,10 +1,25 @@
-# 山風茶屋 — Windows 可玩 Demo 0.7
+# 山風茶屋 — Windows 可玩 Demo 0.8
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV7/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV7 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV8/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV8 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.8 山雨時分
+
+- 每三天一個雨日：第 3、6、9 天等下雨，其餘晴朗。右側顯示當日天氣與明日預報，不使用隨機重抽；存讀由遊戲日數還原同一天氣。
+- 雨滴、冷色光線與程序雨聲；屋簷下聲音較輕。雨滴避開茶屋遮棚與山路涼亭的垂直範圍，不是完整物理碰撞或積水模擬。手帳、對話與暫停會暫停雨滴模擬。
+- 雨天白天，溪谷的荷取、文與椛移至茶屋遮棚；山路上的三人走向涼亭避雨。晴天恢復原本活動。
+- 「茶屋避雨」三段小事件：在茶屋料理台附近，準備三杯山風清茶或竹葉暖茶，逐段點選右側按鈕。優先使用竹葉暖茶，每段消耗一杯、獲得 20 文謝禮。精品品質跟隨料理正確扣除，不改動一般營業結帳或好感規則。
+- 三段依序為荷取、文、椛；完成狀態與故事手帳存檔，不能重複領取。可以分不同雨日完成，雨天夜晚仍照常營業。
+- 不扣體力、不減慢行走、不讓便當腐敗，也不強迫玩家避雨。想快速體驗，可在茶屋「回房休息」前進到第 3 天；請先儲存你想保留的進度。
+
+## GitHub 原始碼
+
+私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
+
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV8/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
@@ -128,6 +143,7 @@
 - `Assets/Scripts/MountainTrip.cs`：0.6 山路場景、區域切換、便當、採集與旅行手帳。
 - `Assets/Scripts/TrailArt.cs`：0.6.1 山路、岩石、瀑布、植被與亭舍細節。
 - `Assets/Scripts/LivingMountain.cs`：0.7 日常巡路、筆記事件、距離環境聲與互動標記。
+- `Assets/Scripts/RainWeather.cs`：0.8 天氣循環、雨滴、遮棚、雨聲與三段避雨茶事件。
 - `Assets/Scripts/TeaHouseWorld.cs`：程序生成的溪谷、茶屋、森林、橋梁和場景材質。
 - `Assets/Scripts/MountainArt.cs`：0.2 的地形、茶屋、森林與環境細節。
 - `Assets/Scripts/AvatarMotion.cs`：分離肢體模型的簡單 FK 動作、入座與離席。
@@ -145,6 +161,7 @@
 - `QAV6/`：0.6 山路、便當交易、跨日保存、七道食譜與 0.5 存檔遷移驗證。
 - `QAV61/`：美術更新後完整流程驗證與含 HUD／無 HUD 實際畫面。
 - `QAV7/`：巡路、筆記事件、音量衰減、存檔相容驗證與實際畫面。
+- `QAV8/`：天氣、事件交易、品質扣除、跨日恢復與雨天執行檔截圖（僅本機）。
 
 命令列建置使用 Unity 的 `-batchmode -quit -projectPath <此資料夾> -executeMethod BuildDemo.Build`。
 
