@@ -59,7 +59,7 @@ public partial class MountainTeaGame
     }
     void PayGuest(Guest g)
     {
-        if(g.paid)return;g.paid=true;data.money+=g.reward;data.served++;
+        if(g.paid)return;NormalizeWeek();data.weekServed++;g.paid=true;data.money+=g.reward;data.served++;
         if(data.night){NormalizePlanning();data.nightIncome+=g.reward;data.nightTips+=Mathf.Max(0,g.reward-Prices[g.dish]);data.sales[g.dish]++;}
         string news=g.name+"："+MountainNews(g);AddFriendship(g);
         string record="第 "+data.day+" 天 · "+news;

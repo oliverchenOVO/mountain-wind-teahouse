@@ -1,10 +1,18 @@
-# 山風茶屋 — Windows 可玩 Demo 0.10
+# 山風茶屋 — Windows 可玩 Demo 0.11
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV10/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV10 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV11/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV11 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.11 七日茶屋生活
+
+- 左側「七日手帖」或茶屋計畫第四頁，串起採集、料理、招待、水車委託、避雨茶、巡山便當、觀景台、筆記後日談、友人故事、庭院裝修與招牌修繕。
+- 從新旅程第一天，或舊存檔首次讀取當天開始，每天解鎖一頁，共七頁。沒有截止日、失敗或扣錢；不必依序完成，第七天之後仍可補做，不限制原本營業及探索。
+- 每頁兩個目標，完成後手動領取茶印與 30 文謝禮；七頁最多共 210 文，不可重複領取。已領頁面與新累計數據均存檔。
+- 採集點、製作成功、已結帳客人從手帖開始累計，不使用容易跨日重置的庫存及晚間報表。失敗料理不計數，重複客人付款不計數。已完成的修繕、故事和委託成果直接承認，不要求重做。
+- 保持原有存檔 version=1，新增欄位向後兼容；不變更天氣週期、互動點 ID、原本料理及角色獎勵。
 
 ## 0.10 茶屋生活美術
 
@@ -36,7 +44,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV10/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV11/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
@@ -164,6 +172,7 @@ Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Win
 - `Assets/Scripts/TeaUITheme.cs`：0.9 程式生成圓角紙卡、木框、茶杯印章、葉片與按鈕。
 - `Assets/Scripts/AudioSettings.cs`：0.9 四項音量、靜音、試聽、獨立設定存檔與驗證。
 - `Assets/Scripts/TeaLifeArt.cs`：0.10 茶屋擺設、紙傘、屋簷水滴與動態肖像控制。
+- `Assets/Scripts/TeaWeek.cs`：0.11 七日手帖、可補做目標、一次性謝禮與兼容測試。
 - `Assets/Scripts/AvatarExpression.cs`：0.10 分離網格眨眼、微笑與頭部小動作。
 - `Assets/Scripts/TeaHouseWorld.cs`：程序生成的溪谷、茶屋、森林、橋梁和場景材質。
 - `Assets/Scripts/MountainArt.cs`：0.2 的地形、茶屋、森林與環境細節。

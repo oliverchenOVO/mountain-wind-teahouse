@@ -90,7 +90,7 @@ public partial class MountainTeaGame
         Box(new Rect(0,0,1440,900),new Color(0,0,0,.4f));Panel(new Rect(155,105,1130,695));
         Text(190,126,700,40,"茶屋計畫 · "+data.money+" 文",heading);
         if(Button(1080,125,170,"收起 [Esc]")){Save(false);planning=false;}
-        for(int t=0;t<3;t++)if(Button(190+t*290,183,275,new[]{"每日菜單","庭院裝修","營業結算"}[t]))planningTab=t;
+        for(int t=0;t<4;t++)if(Button(190+t*265,183,250,new[]{"每日菜單","庭院裝修","營業結算","七日手帖"}[t]))planningTab=t;
         if(planningTab==0)
         {
             Text(190,242,1050,36,data.night?"今晚菜單已鎖定；可備餐補貨，明天再調整。":"勾選今晚供應的餐點。目標數量只是備餐提醒，不會自動扣材料。",small);
@@ -122,6 +122,7 @@ public partial class MountainTeaGame
             }
             Text(190,740,1050,35,"裝修為外觀選擇，不收維護費，也不影響角色故事。",small);
         }
+        else if(planningTab==3)DrawTeaWeek();
         else
         {
             Text(190,255,1000,125,data.reportDay==0?"第一次營業後，這裡會留下完整結算。":ReportSummary(),body);

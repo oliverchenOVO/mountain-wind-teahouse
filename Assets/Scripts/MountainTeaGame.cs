@@ -19,6 +19,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public int lunchState,lunchDay,deliveries,chestnuts,berries,chestnutRice,berryTea,qualityChestnutRice,qualityBerryTea;
         public int notebookStage,routineDay;public List<RoutineState> routines;
         public int rainStoryStage;
+        public int weekStartDay,weekHarvest,weekCraft,weekServed;public bool[] weekClaimed;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -210,7 +211,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(s.kind<3)
         {
             if(data.harvested.Contains(s.id)||data.night)return;
-            data.harvested.Add(s.id); if(s.visual)s.visual.SetActive(false);
+            NormalizeWeek();data.weekHarvest++;data.harvested.Add(s.id); if(s.visual)s.visual.SetActive(false);
             if(playerMotion)playerMotion.Gesture=1;
             if(s.kind==0)data.leaves+=3;else if(s.kind==1)data.mushrooms+=2;else data.bamboo+=2;
             Notify(s.name+" ＋"+(s.kind==0?3:2));Play(pickupSound);Save(false);return;
@@ -235,7 +236,7 @@ public partial class MountainTeaGame : MonoBehaviour
         else if(dish==5&&Ingredients(5)){data.chestnuts-=2;data.mushrooms--;data.chestnutRice++;}
         else if(dish==6&&Ingredients(6)){data.berries-=2;data.leaves--;data.berryTea++;}
         else {Notify("材料不足，白天去山中找找。",4);return false;}
-        Notify("製作完成："+DishNames[dish]);Play(pickupSound);Save(false);return true;
+        NormalizeWeek();data.weekCraft++;Notify("製作完成："+DishNames[dish]);Play(pickupSound);Save(false);return true;
     }
     public int Stock(int dish){return dish==0?data.tea:dish==1?data.meal:dish==2?data.grilled:dish==3?data.soup:dish==4?data.leafTea:dish==5?data.chestnutRice:dish==6?data.berryTea:0;}
     public bool CompleteQuest()
@@ -362,6 +363,7 @@ public partial class MountainTeaGame : MonoBehaviour
     public void Save(bool feedback=true)
     {
         if(!started)return;
+        NormalizeWeek();
         data.serviceRevision=3;
         data.x=player.position.x;data.z=player.position.z;
         if(trial){data.x=beforeTrial.x;data.z=beforeTrial.z;}
@@ -384,6 +386,7 @@ public partial class MountainTeaGame : MonoBehaviour
             if(data.harvested==null)data.harvested=new List<int>();if(data.guests==null)data.guests=new List<Guest>();
             MigrateCafe();
             NormalizePlanning();
+            NormalizeWeek();
             if(!Walkable(new Vector3(data.x,0,data.z))){data.onTrail=false;data.x=-6;data.z=-7;}
             player.position=new Vector3(data.x,GroundHeight(data.x,data.z),data.z);SyncTrip();
             foreach(var s in spots)if(s.kind<3)s.visual.SetActive(!data.harvested.Contains(s.id));
@@ -475,7 +478,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.10",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.11",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -521,6 +524,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(Button(980,150,205,"手帳 [Tab]"))notebook=true;
         if(Button(1200,150,215,"茶屋計畫"))OpenPlanning();
         if(Button(25,290,285,"旅行手帳 · 山中委託")){travelBook=true;notebook=false;}
+        if(Button(25,625,285,"七日手帖 · "+WeekStamps()+" / 7 茶印"))OpenPlanning(3);
         if(data.onTrail)Text(35,345,300,95,"瀑布山路\n"+LunchStatus()+"\n山栗 "+data.chestnuts+" · 野莓 "+data.berries,small);
         if(data.notebookStage>0&&data.notebookStage<6){Panel(new Rect(25,455,330,135));Text(42,468,298,30,"巡山筆記 · 下一步",heading);Text(42,511,298,72,NotebookHint(),small);}
         Panel(new Rect(25,125,285,155));Text(45,141,250,36,data.onTrail?"山路小旅行":data.restored?"山中友人的日常":"今天的小目標",heading);
@@ -728,7 +732,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -796,6 +800,9 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"29-tea-house-life.png"));
         yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;Say("射命丸文","雨聲剛好蓋過山路的喧鬧。\n今天就留在茶屋，慢慢喝完這杯茶吧。");SetDialogueMood(1);
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"30-aya-expression.png"));
+        yield return new WaitForSeconds(.5f);modal=false;data.weekStartDay=1;data.day=7;data.weekHarvest=3;data.weekCraft=5;data.weekServed=9;data.questDone=true;data.deliveries=1;data.lookoutVisited=true;data.notebookStage=6;data.restored=true;data.rainStoryStage=3;Friendship(0).stage=1;NormalizePlanning();data.gardenOwned[0]=2;ClaimWeek(0);ClaimWeek(1);OpenPlanning(3);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"31-seven-day-journal.png"));
+        yield return new WaitForSeconds(.5f);planning=false;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

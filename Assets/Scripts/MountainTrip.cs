@@ -122,7 +122,7 @@ public partial class MountainTeaGame
         if(s.kind==20||s.kind==21){if(!ChangeRegion(s.kind==20))Notify("先結束營業或放回送餐托盤，再出發。");return;}
         if(s.kind==23||s.kind==24)
         {
-            if(data.harvested.Contains(s.id))return;data.harvested.Add(s.id);s.visual.SetActive(false);
+            if(data.harvested.Contains(s.id))return;NormalizeWeek();data.weekHarvest++;data.harvested.Add(s.id);s.visual.SetActive(false);
             if(s.kind==23)data.chestnuts+=2;else data.berries+=2;Notify(s.name+" ＋2");Save(false);return;
         }
         if(s.kind==22){if(!DeliverLunch())Say("犬走椛",data.lunchState==1?"到茶屋料理台打包一份竹筍菇飯，再送到這個哨所吧。":"山路今天很平靜。打開旅行手帳，可以接下巡山便當委託。\n沒有時間限制，路上慢慢逛就好。");}
