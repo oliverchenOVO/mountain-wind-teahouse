@@ -28,7 +28,7 @@ public partial class MountainTeaGame
     }
     void SyncWeatherPeople()
     {
-        if(valleyHomes==null)return;bool shelter=IsRainDay&&!data.night;
+        if(valleyHomes==null)return;bool shelter=(IsRainDay||IsFestivalDay)&&!data.night;
         Vector3[] refuge={new Vector3(-15.5f,0,-3.8f),new Vector3(-10.2f,0,-3.8f),new Vector3(-8.3f,0,-3.8f)};
         for(int i=0;i<3;i++)
         {
@@ -40,7 +40,7 @@ public partial class MountainTeaGame
     }
     void TickRainWeather(float dt)
     {
-        if(!rainDrops)return;SyncWeatherPeople();bool wet=started&&IsRainDay;
+        if(!rainDrops)return;SyncWeatherPeople();SyncFestivalArt();bool wet=started&&IsRainDay;
         float volume=wet?(Sheltered(player.position)?.22f:.42f)*AmbienceVolumeGain:0;
         rainAudio.volume=Mathf.Lerp(rainAudio.volume,volume,1-Mathf.Exp(-dt*3));
         weatherBlend=Mathf.Lerp(weatherBlend,wet?1:0,1-Mathf.Exp(-dt*3));

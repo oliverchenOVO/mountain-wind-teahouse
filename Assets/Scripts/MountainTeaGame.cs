@@ -23,6 +23,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public int specialDay,specialDish,nightSpecialIncome;
         public bool comfortUpgrade,prepUpgrade;
         public bool guideHidden;
+        public bool[] festivalShared;public bool festivalRewardClaimed;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -96,6 +97,7 @@ public partial class MountainTeaGame : MonoBehaviour
         BuildRainWeather();
         BuildTeaLife();
         BuildUpgradeArt();
+        BuildFestival();
         CreatePortraits();
         LoadAudioPreferences();
         if(qa) StartCoroutine(QARun());
@@ -362,7 +364,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(success&&!data.trialDone){data.trialDone=true;data.money+=50;Notify("符卡練習通過 · ＋50 文！",6);Play(chime);Save(false);}
         else Notify(success?"再一次漂亮地避開了彈幕！":"練習結束。和椛說話就能再試，沒有懲罰。",5);
     }
-    void Say(string n,string words){rainDialogue=false;speaker=n;dialogue=words;modal=true;SetDialogueMood(n=="河城荷取"?2:n=="犬走椛"?3:1);}
+    void Say(string n,string words){rainDialogue=false;festivalDialogue=false;speaker=n;dialogue=words;modal=true;SetDialogueMood(n=="河城荷取"?2:n=="犬走椛"?3:1);}
     void Notify(string words,float time=3){toast=words;toastTimer=time;}
     void Play(AudioClip c){if(audioSource&&c)audioSource.PlayOneShot(c);}
     public void Save(bool feedback=true)
@@ -370,6 +372,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)return;
         NormalizeWeek();
         NormalizeSpecial();
+        NormalizeFestival();
         data.serviceRevision=3;
         data.x=player.position.x;data.z=player.position.z;
         if(trial){data.x=beforeTrial.x;data.z=beforeTrial.z;}
@@ -394,6 +397,7 @@ public partial class MountainTeaGame : MonoBehaviour
             NormalizePlanning();
             NormalizeWeek();
             NormalizeSpecial();
+            NormalizeFestival();
             if(!Walkable(new Vector3(data.x,0,data.z))){data.onTrail=false;data.x=-6;data.z=-7;}
             player.position=new Vector3(data.x,GroundHeight(data.x,data.z),data.z);SyncTrip();
             foreach(var s in spots)if(s.kind<3)s.visual.SetActive(!data.harvested.Contains(s.id));
@@ -430,6 +434,7 @@ public partial class MountainTeaGame : MonoBehaviour
         travelBook=false;
         photoMode=false;
         rainDialogue=false;
+        festivalDialogue=false;
         settingsOpen=false;
     }
     void ReturnMenu()
@@ -524,6 +529,7 @@ public partial class MountainTeaGame : MonoBehaviour
     {
         Panel(new Rect(25,25,450,93));TeaSeal(new Rect(44,43,53,53));Text(111,37,344,35,"山風茶屋 · "+(IsRainDay?"山雨時分":"晴日山風"),heading);
         DrawRainHUD();
+        DrawFestivalHUD();
         int minutes=9*60+Mathf.FloorToInt(data.clock/360*9*60);
         Text(111,77,340,28,"第 "+data.day+" 天 · "+(data.night?"18:00 營業中":(minutes/60).ToString("00")+":"+(minutes%60).ToString("00"))+" · "+data.money+" 文",small);
         Panel(new Rect(980,25,435,110));Text(1000,37,395,30,"材料  茶葉 "+data.leaves+" · 菇 "+data.mushrooms+" · 筍 "+data.bamboo+" · 魚 "+data.fish,small);
@@ -587,6 +593,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(hasPortrait)TeaTag(new Rect(925,349,150,30),dialogueMood==1?"安心微笑":dialogueMood==2?"好奇傾聽":dialogueMood==3?"認真巡查":"山中日常",sage);
         Text(hasPortrait?515:367,415,hasPortrait?560:706,170,dialogue,body);
         if(rainDialogue){if(Button(730,633,345,"收好茶杯 [Esc]")){modal=false;speaker="";rainDialogue=false;}return;}
+        if(festivalDialogue){if(Button(730,633,345,"記住今天的聚會 [Esc]")){modal=false;speaker="";festivalDialogue=false;}return;}
         if(storyGuest>=0){if(Button(365,633,350,"謝謝消息，結帳送客"))FinishStory();}
         else if(eventFriend>=0){int current=eventFriend;if(Button(365,633,350,Friendship(current).stage==1?"交付食材，繼續故事":"繼續故事",EventReady(current)&&EventMaterials(current)))CompleteFriendEvent(current);}
         else if(speaker=="茶屋料理台")
@@ -739,7 +746,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -848,6 +855,13 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);paused=true;photoMode=false;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"46-paused-life-actions.png"));
         yield return new WaitForSeconds(.5f);paused=false;photoMode=false;cam.orthographicSize=11.5f;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;data.day=7;data.tea=data.meal=data.grilled=3;player.position=new Vector3(-12,0,-3);cam.transform.position=new Vector3(-12,0,-6)+CameraOffset;SyncFestivalArt();OpenPlanning(5);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"47-festival-invitations.png"));
+        yield return new WaitForSeconds(.5f);planning=false;ShareFestival(0);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"48-festival-friend-dialogue.png"));
+        yield return new WaitForSeconds(.5f);modal=false;ShareFestival(1);modal=false;ShareFestival(2);modal=false;photoMode=true;toastTimer=0;cam.orthographicSize=9;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"49-festival-teahouse.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

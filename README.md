@@ -1,10 +1,18 @@
-# 山風茶屋 — Windows 可玩 Demo 0.16
+# 山風茶屋 — Windows 可玩 Demo 0.17
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV16/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV16 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV17/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV17 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.17 山中小祭典
+
+- 第 7、14、21……天掛起紅金燈籠，三位友人白天在茶屋前小聚，雨天照常，夜晚回到原本的營業流程。沒有四季系統，也不是限時失敗任務。
+- 「茶屋計畫 → 小祭典」查看下次日期與邀請。祭典日 HUD 也提供入口；回料理台附近準備清茶、菇飯、鹽燒，各分享一份給文、荷取、椛，閱讀三段新對話。
+- 每位友人的邀請只完成一次；未完成進度可以留到下次祭典，不扣好感或影響原故事。分享會扣實際料理與相應精品數量，與菜單是否上架無關。
+- 三份邀請完成後獲得一次 60 文謝禮與永久三友紀念牌；以後祭典仍掛燈籠，不重複領獎或扣料理。記錄收入不併入夜間營業報表。
+- 保留 version=1 存檔，新增邀請與謝禮旗標；舊進度預設尚未參加。裝飾不增加碰撞或改變座位。原 WindowsV16 仍保留。
 
 ## 0.16 角色生活動作
 
@@ -88,7 +96,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV16/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV17/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
