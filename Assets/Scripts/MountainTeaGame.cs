@@ -504,7 +504,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.28",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.29",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -763,7 +763,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();TestServiceReadability();TestTeaNightScene();TestRiverScenery();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();TestServiceReadability();TestTeaNightScene();TestRiverScenery();TestTrailRestStops();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -1018,6 +1018,21 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);ChangeRegion(true);player.position=TP(94,2);cam.transform.position=player.position+CameraOffset;photoMode=true;toastTimer=0;
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"110-river-mountain-bridge.png"));
         yield return new WaitForSeconds(.5f);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;modal=false;paused=true;settingsOpen=true;toastTimer=0;
+        CloseAudioSettings();paused=false;NewGame();modal=false;ChangeRegion(true);player.position=TP(85.8f,18.1f);cam.transform.position=player.position+CameraOffset;cam.orthographicSize=9;photoMode=true;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"111-rest-lookout.png"));
+        yield return new WaitForSeconds(.5f);player.position=TP(105.8f,17.6f);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"112-rest-patrol.png"));
+        yield return new WaitForSeconds(.5f);player.position=TP(88.8f,9);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"113-rest-lookout-spur.png"));
+        yield return new WaitForSeconds(.5f);player.position=TP(103,1.8f);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"114-rest-route-sign.png"));
+        yield return new WaitForSeconds(.5f);player.position=TP(85.8f,18.1f);cam.transform.position=player.position+CameraOffset;data.day=3;SyncWeatherPeople();toastTimer=0;
+        yield return new WaitForSeconds(3);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"115-rest-rain-lookout.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;player.position=TP(86,21);cam.transform.position=player.position+CameraOffset;nearest=SelectNearestSpot();toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"116-rest-original-lookout-action.png"));
+        yield return new WaitForSeconds(.5f);player.position=TP(85.8f,18.1f);cam.transform.position=player.position+CameraOffset;photoMode=true;Screen.SetResolution(1024,768,FullScreenMode.Windowed);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"117-rest-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"28-settings-small-window.png"));

@@ -50,7 +50,7 @@ public partial class MountainTeaGame
             }
         }
         TrailDressing(route);
-        Shelter(TP(106,20),"天狗哨所");Shelter(TP(86,21),"瀑布觀景亭");
+        Shelter(TP(106,20),"天狗哨所");Shelter(TP(86,21),"瀑布觀景亭");BuildTrailRestStops();
         AddSpot("前往瀑布山路",ValleyGate,20);
         AddSpot("返回河童溪谷",TrailStart,21);
         AddSpot("巡山中的椛",TP(106,18),22,"Momiji");
@@ -69,7 +69,7 @@ public partial class MountainTeaGame
         var batch=new List<GameObject>();
         foreach(var renderer in trailRoot.GetComponentsInChildren<MeshRenderer>())
         {
-            if(renderer.GetComponentInParent<AvatarMotion>()||renderer.GetComponent<WaterRibbon>()||renderer.name=="Faceted mountain canopy"||renderer.transform.parent.name=="山栗"||renderer.transform.parent.name=="野莓")continue;
+            if(renderer.GetComponent<TextMesh>()||renderer.GetComponentInParent<AvatarMotion>()||renderer.GetComponent<WaterRibbon>()||renderer.name=="Faceted mountain canopy"||renderer.transform.parent.name=="山栗"||renderer.transform.parent.name=="野莓")continue;
             batch.Add(renderer.gameObject);
         }
         StaticBatchingUtility.Combine(batch.ToArray(),trailRoot.gameObject);

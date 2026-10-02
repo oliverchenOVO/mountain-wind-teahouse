@@ -1,10 +1,18 @@
-# 山風茶屋 — Windows 可玩 Demo 0.28
+# 山風茶屋 — Windows 可玩 Demo 0.29
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV28/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV28 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV29/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV29 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.29 山路歇腳處
+
+- 小橋西岸新增連接觀景亭的土色支線，三處木製路標標示小橋、溪谷、觀景亭與哨所方向；沿用原地形與原有通行範圍。
+- 觀景亭前側補上小茶桌、竹托盤、茶壺茶杯、長凳坐墊、竹籃與盆栽；哨所側邊有巡山用品箱、普通記事本、繩線與晾巾架。
+- 小物配置在側邊，保留亭前中央、椛與友人雨天避雨位置；步道石只作視覺細節，不新增碰撞或修改角色高度。
+- 路標與小物都是場景裝飾，不新增任務、拾取、收費或坐下按鍵。巡山用品箱上的記事本不是原有遺失筆記線索；原線索、便當交付與觀景台閱讀流程不變。
+- 景物只在場景建立時生成，保留靜態合批；路標文字不合批，不新增燈光、粒子系統、存檔欄位或每日重建。
 
 ## 0.28 溪谷水景
 
@@ -189,7 +197,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV28/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV29/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
