@@ -42,7 +42,7 @@ public class ValleyAtmosphere : MonoBehaviour
     {
         var g=new GameObject(name);g.transform.SetParent(transform);g.transform.position=p;g.transform.rotation=Quaternion.Euler(-90,0,0);
         var ps=g.AddComponent<ParticleSystem>();ps.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
-        var main=ps.main;main.duration=8;main.loop=true;main.startLifetime=new ParticleSystem.MinMaxCurve(lifetime*.7f,lifetime);main.startSize=new ParticleSystem.MinMaxCurve(size*.6f,size);main.startSpeed=.12f;main.startColor=color;main.simulationSpace=ParticleSystemSimulationSpace.World;main.maxParticles=100;
+        var main=ps.main;main.cullingMode=ParticleSystemCullingMode.AlwaysSimulate;main.duration=8;main.loop=true;main.startLifetime=new ParticleSystem.MinMaxCurve(lifetime*.7f,lifetime);main.startSize=new ParticleSystem.MinMaxCurve(size*.6f,size);main.startSpeed=.12f;main.startColor=color;main.simulationSpace=ParticleSystemSimulationSpace.World;main.maxParticles=100;
         var emission=ps.emission;emission.rateOverTime=rate;var shape=ps.shape;shape.shapeType=ParticleSystemShapeType.Cone;shape.radius=radius;shape.angle=12;
         var colorLife=ps.colorOverLifetime;colorLife.enabled=true;var gradient=new Gradient();gradient.SetKeys(new[]{new GradientColorKey(Color.white,0),new GradientColorKey(Color.white,1)},new[]{new GradientAlphaKey(0,0),new GradientAlphaKey(.7f,.15f),new GradientAlphaKey(0,1)});colorLife.color=gradient;
         var renderer=ps.GetComponent<ParticleSystemRenderer>();renderer.sharedMaterial=mist;renderer.shadowCastingMode=ShadowCastingMode.Off;renderer.receiveShadows=false;ps.Play();return ps;

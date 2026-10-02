@@ -59,19 +59,19 @@ public partial class MountainTeaGame
     void DrawCookingLife()
     {
         if(cookingFinishTime<=0||CookingFrozen||photoMode||brewing)return;
-        Panel(new Rect(450,305,540,65));TeaSeal(new Rect(468,316,40,40));
-        Text(520,320,445,35,(cookingPerfect?"精品出爐 · ":"暖暖完成 · ")+DishNames[brewDish],heading);
+        Panel(new Rect(450,610,540,65));TeaSeal(new Rect(468,621,40,40));
+        Text(520,625,445,35,(cookingPerfect?"精品出爐 · ":"暖暖完成 · ")+DishNames[brewDish],heading);
     }
     void DrawCookingIllustration()
     {
         // A cached-time illustration also makes the process legible beneath the roof.
-        float cx=504,cy=359;
+        float cx=504,cy=559;
         RoundFill(new Rect(cx-35,cy-12,70,32),sage);RoundFill(new Rect(cx-40,cy-15,80,8),gold);
         if(TeaBrew(brewDish)){RoundFill(new Rect(cx+30,cy-9,25,11),sage);RoundFill(new Rect(cx-7,cy-23,14,8),sage);}
         else for(int i=0;i<3;i++){float h=13+Mathf.Sin(cookingClock*7+i*2)*4;RoundFill(new Rect(cx-21+i*16,cy+27-h,10,h),gold);}
         for(int i=0;i<3;i++){float p=Mathf.Repeat(cookingClock*.45f+i/3f,1);RoundFill(new Rect(cx-22+i*20+Mathf.Sin(p*4)*4,cy-27-p*33,6,12),new Color(.48f,.59f,.49f,(1-p)*.7f));}
-        Text(570,328,400,34,TeaBrew(brewDish)?"溫壺 · 茶香慢慢舒展":"添柴 · 小火照亮鍋沿",heading);
-        Text(570,366,400,28,"不趕時間，等火候落在金色區域。",small);
+        Text(570,528,400,34,TeaBrew(brewDish)?"溫壺 · 茶香慢慢舒展":"添柴 · 小火照亮鍋沿",heading);
+        Text(570,566,400,28,"不趕時間，等火候落在金色區域。",small);
     }
     void TestCookingLife()
     {

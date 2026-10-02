@@ -20,7 +20,7 @@ public partial class MountainTeaGame
         rainRoof=TeaHouseWorld.Shape("Rain awning cloth",PrimitiveType.Cube,new Vector3(-12,3.3f,-3.6f),new Vector3(12,.16f,3.4f),sage,rainAwning).GetComponent<Renderer>();
         for(int x=-18;x<=-6;x+=12)TeaHouseWorld.Shape("Rain awning post",PrimitiveType.Cylinder,new Vector3(x,1.65f,-5.1f),new Vector3(.15f,1.65f,.15f),new Color(.42f,.3f,.2f),rainAwning);
         var g=new GameObject("Mountain rain streaks");rainDrops=g.AddComponent<ParticleSystem>();rainDrops.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
-        var main=rainDrops.main;main.loop=true;main.startLifetime=.9f;main.startSpeed=0;main.startSize=.045f;main.maxParticles=500;main.simulationSpace=ParticleSystemSimulationSpace.World;
+        var main=rainDrops.main;main.cullingMode=ParticleSystemCullingMode.AlwaysSimulate;main.loop=true;main.startLifetime=.9f;main.startSpeed=0;main.startSize=.045f;main.maxParticles=500;main.simulationSpace=ParticleSystemSimulationSpace.World;
         var emission=rainDrops.emission;emission.enabled=false;var shape=rainDrops.shape;shape.enabled=false;
         var renderer=g.GetComponent<ParticleSystemRenderer>();renderer.renderMode=ParticleSystemRenderMode.Stretch;renderer.lengthScale=8;renderer.velocityScale=.035f;renderer.shadowCastingMode=ShadowCastingMode.Off;renderer.receiveShadows=false;
         var material=new Material(Resources.Load<Shader>("Shaders/SoftParticle"));material.color=new Color(.74f,.85f,.89f,.55f);renderer.sharedMaterial=material;

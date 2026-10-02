@@ -68,7 +68,7 @@ public partial class MountainTeaGame
     {
         var material=new Material(Resources.Load<Shader>("Shaders/SoftParticle"));material.color=new Color(.73f,.84f,.88f,.5f);
         var g=new GameObject("Rain eave drips");g.transform.SetParent(lifeRoot);eaveDrops=g.AddComponent<ParticleSystem>();eaveDrops.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
-        var main=eaveDrops.main;main.maxParticles=100;main.simulationSpace=ParticleSystemSimulationSpace.World;main.startSpeed=0;main.startSize=.035f;main.startLifetime=.55f;
+        var main=eaveDrops.main;main.cullingMode=ParticleSystemCullingMode.AlwaysSimulate;main.maxParticles=100;main.simulationSpace=ParticleSystemSimulationSpace.World;main.startSpeed=0;main.startSize=.035f;main.startLifetime=.55f;
         var emission=eaveDrops.emission;emission.enabled=false;var shape=eaveDrops.shape;shape.enabled=false;var renderer=eaveDrops.GetComponent<ParticleSystemRenderer>();renderer.sharedMaterial=material;renderer.renderMode=ParticleSystemRenderMode.Stretch;renderer.lengthScale=4;renderer.velocityScale=.03f;renderer.shadowCastingMode=ShadowCastingMode.Off;eaveDrops.Play();
         puddleRoot=new GameObject("Rain ground water marks");puddleRoot.transform.SetParent(lifeRoot);
         for(int i=0;i<5;i++)

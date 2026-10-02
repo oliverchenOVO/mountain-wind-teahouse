@@ -116,13 +116,13 @@ public partial class MountainTeaGame
             if(Button(960,760,455,"放回料理台",Vector3.Distance(player.position,new Vector3(-12,0,-2.2f))<4))ReturnTray();
         }
         if(!brewing)return;
-        Box(new Rect(0,0,1440,900),new Color(0,0,0,.3f));Panel(new Rect(420,290,600,290));DrawCookingIllustration();
-        Text(450,403,540,32,"料理火候 · "+DishNames[brewDish],body);
-        Box(new Rect(450,438,540,24),sage);Box(new Rect(450+540*PerfectStart,438,540*(PerfectEnd-PerfectStart),24),gold);
-        Box(new Rect(450+BrewPosition*540-4,430,8,40),ink);
-        Text(450,480,540,32,"金色區域按 Space · 精品料理額外 ＋10 文",small);
-        if(Button(450,525,260,"完成料理 [Space]"))FinishBrew();
-        if(Button(730,525,260,"取消 [Esc]"))CancelBrew();
+        Box(new Rect(0,0,1440,900),new Color(0,0,0,.3f));Panel(new Rect(420,490,600,290));DrawCookingIllustration();
+        Text(450,603,540,32,"料理火候 · "+DishNames[brewDish],body);
+        Box(new Rect(450,638,540,24),sage);Box(new Rect(450+540*PerfectStart,638,540*(PerfectEnd-PerfectStart),24),gold);
+        Box(new Rect(450+BrewPosition*540-4,630,8,40),ink);
+        Text(450,680,540,32,"金色區域按 Space · 精品料理額外 ＋10 文",small);
+        if(Button(450,725,260,"完成料理 [Space]"))FinishBrew();
+        if(Button(730,725,260,"取消 [Esc]"))CancelBrew();
     }
     void TestFinishWave()
     {
