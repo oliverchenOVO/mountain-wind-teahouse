@@ -22,13 +22,16 @@ public partial class MountainTeaGame
         if(d<0||d>=DishNames.Length||!RecipeUnlocked(d)){Notify("這道食譜尚未解鎖。");return;}
         if(data.holding||data.lunchState==2){Notify("先送餐，或把托盤／便當放回料理台。");return;}
         if(!Ingredients(d)){Notify("材料不足，白天去山中找找。");return;}
-        brewDish=d;brewTimer=0;brewing=true;modal=false;
+        if(brewing)return;
+        ResetCookingLife();brewDish=d;brewTimer=0;brewing=true;modal=false;
     }
     void FinishBrew()
     {
+        if(!brewing)return;
         bool perfect=BrewPosition>=PerfectStart&&BrewPosition<=PerfectEnd;
         brewing=false;
-        if(Craft(brewDish)){if(perfect)ChangeQuality(brewDish,1);Notify((perfect?"恰到好處！精品 ":"製作完成：")+DishNames[brewDish]+(perfect?" · 客人額外付 10 文":""),5);Save(false);}
+        ResetCookingLife();
+        if(Craft(brewDish)){cookingPerfect=perfect;cookingFinishTime=3;if(perfect)ChangeQuality(brewDish,1);Notify((perfect?"恰到好處！精品 ":"製作完成：")+DishNames[brewDish]+(perfect?" · 客人額外付 10 文":""),5);Save(false);}
     }
     bool PickTray(int guest,int dish)
     {
@@ -106,19 +109,20 @@ public partial class MountainTeaGame
     }
     void DrawCafeOverlay()
     {
+        DrawCookingLife();
         if(data.holding&&!modal&&!notebook&&!paused&&!relationships&&!planning)
         {
             // The context card and ground ring identify the actual delivery target.
             if(Button(960,760,455,"放回料理台",Vector3.Distance(player.position,new Vector3(-12,0,-2.2f))<4))ReturnTray();
         }
         if(!brewing)return;
-        Box(new Rect(0,0,1440,900),new Color(0,0,0,.3f));Panel(new Rect(420,350,600,230));
-        Text(450,375,540,40,"料理火候 · "+DishNames[brewDish],heading);
+        Box(new Rect(0,0,1440,900),new Color(0,0,0,.3f));Panel(new Rect(420,290,600,290));DrawCookingIllustration();
+        Text(450,403,540,32,"料理火候 · "+DishNames[brewDish],body);
         Box(new Rect(450,438,540,24),sage);Box(new Rect(450+540*PerfectStart,438,540*(PerfectEnd-PerfectStart),24),gold);
         Box(new Rect(450+BrewPosition*540-4,430,8,40),ink);
         Text(450,480,540,32,"金色區域按 Space · 精品料理額外 ＋10 文",small);
         if(Button(450,525,260,"完成料理 [Space]"))FinishBrew();
-        if(Button(730,525,260,"取消 [Esc]")){brewing=false;Notify("材料沒有消耗。");}
+        if(Button(730,525,260,"取消 [Esc]"))CancelBrew();
     }
     void TestFinishWave()
     {

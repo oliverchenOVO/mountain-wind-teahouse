@@ -1,10 +1,18 @@
-# 山風茶屋 — Windows 可玩 Demo 0.21
+# 山風茶屋 — Windows 可玩 Demo 0.22
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV21/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV21 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV22/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV22 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.22 料理生活感
+
+- 備茶時茶壺升起較明顯的蒸汽；飯、魚與湯則有爐口小火和暖色燈光。原有常駐蒸汽保留，新效果只在備餐或剛完成時出現。
+- 火候紙卡加入動態茶壺／鍋具插畫與不同的備餐文字，維持原有金色區域、Space 完成和 Esc 取消。
+- 完成時出現三秒的料理紙籤，精品蒸汽帶淡金色；不增加品質獎勵、價格或食譜。仍只在完成時消耗一次材料，重複完成呼叫不會重複製作。
+- 暫停與其他介面停止新動畫和火候計時；取消、跨日、讀檔、新旅程及回主選單清除暫時效果。沿用原有存檔格式。
+- 新蒸汽使用十二個快取的柔邊面片，不建立額外粒子工作或每幀新物件；爐火不增加碰撞或陰影光源。建築仍可能遮住爐台，不是屋頂透視系統。
 
 ## 0.21 互動回饋
 
@@ -132,7 +140,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV21/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV22/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 

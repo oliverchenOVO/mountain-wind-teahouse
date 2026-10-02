@@ -102,6 +102,7 @@ public partial class MountainTeaGame : MonoBehaviour
         BuildFestival();
         BuildSupplyCart();
         BuildCanopyViews();
+        BuildCookingLife();
         CreatePortraits();
         LoadAudioPreferences();
         if(qa) StartCoroutine(QARun());
@@ -141,7 +142,7 @@ public partial class MountainTeaGame : MonoBehaviour
         {
             if(settingsOpen){CloseAudioSettings();}
             else if(fishing){fishing=false;Notify("收起釣竿。");}
-            else if(brewing){brewing=false;Notify("已取消，材料沒有消耗。");}
+            else if(brewing){CancelBrew();}
             else if(modal){if(storyGuest>=0)FinishStory();else {modal=false;speaker="";eventFriend=-1;}}
             else if(relationships){relationships=false;notebook=true;}
             else if(planning){Save(false);planning=false;}
@@ -151,7 +152,7 @@ public partial class MountainTeaGame : MonoBehaviour
         }
         if(started&&!paused&&!modal&&!result&&!brewing&&Input.GetKeyDown(KeyCode.Tab)){if(travelBook){travelBook=false;notebook=true;}else if(planning){Save(false);planning=false;notebook=true;}else if(relationships){relationships=false;notebook=true;}else notebook=!notebook;return;}
         AvatarMotion.Frozen=!started||paused||notebook||modal||result||brewing||relationships||planning||travelBook||settingsOpen;
-        if(brewing){brewTimer+=Time.deltaTime;if(Input.GetKeyDown(KeyCode.Space))FinishBrew();return;}
+        if(brewing){if(!CookingFrozen){brewTimer+=Time.deltaTime;if(Input.GetKeyDown(KeyCode.Space))FinishBrew();}return;}
         if(!started||paused||notebook||modal||result||relationships||planning||travelBook||settingsOpen) return;
         if(Input.GetKeyDown(KeyCode.F5)) Save();
         if(fishing)
@@ -315,7 +316,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(data.night)foreach(var g in data.guests)if(!g.done){if(g.state>=2)PayGuest(g);else data.lost++;}
         if(data.night){data.reportDay=data.day;}
         TodayLedger().closed=true;
-        storyGuest=-1;brewing=false;
+        storyGuest=-1;brewing=false;ResetCookingLife();
         data.day++;data.clock=0;data.night=false;data.harvested.Clear();data.guests.Clear();data.wave=0;duskNotified=false;
         data.onTrail=false;travelBook=false;SyncTrip();
         if(Friendship(2).stage==3)data.bamboo+=2;
@@ -428,6 +429,7 @@ public partial class MountainTeaGame : MonoBehaviour
     void OnApplicationPause(bool pause){if(pause)Save(false);}
     void ResetTransient()
     {
+        ResetCookingLife();
         if(visitorRoot)foreach(Transform guest in visitorRoot)Destroy(guest.gameObject);visitors.Clear();ValleyAtmosphere.ClearMeals();
         trial=false;fishing=false;paused=false;notebook=false;modal=false;result=false;nearest=null;duskNotified=false;brewing=false;storyGuest=-1;relationships=false;eventFriend=-1;AvatarMotion.Frozen=false;if(playerMotion)playerMotion.Carrying=false;
         foreach(var b in bullets)Destroy(b.visual);bullets.Clear();
@@ -492,7 +494,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.16",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.22",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -749,7 +751,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -912,6 +914,16 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"68-action-notebook-clue.png"));
         yield return new WaitForSeconds(.5f);ChangeRegion(false);player.position=ValleyGate;cam.transform.position=player.position+CameraOffset;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"69-action-travel.png"));
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;data.leaves=20;data.mushrooms=20;data.bamboo=20;player.position=new Vector3(-12,0,-3);cam.transform.position=player.position+CameraOffset;toastTimer=0;BeginBrew(0);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"70-cooking-tea.png"));
+        yield return new WaitForSeconds(.5f);CancelBrew();BeginBrew(1);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"71-cooking-meal.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"72-cooking-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);brewTimer=(PerfectStart+PerfectEnd)*.5f/.42f;FinishBrew();
+        yield return new WaitForSeconds(.7f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"73-cooking-perfect.png"));
+        yield return new WaitForSeconds(3);BeginBrew(0);CancelBrew();toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"74-cooking-cancelled.png"));
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
