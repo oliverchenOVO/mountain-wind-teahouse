@@ -24,6 +24,7 @@ public partial class MountainTeaGame
     }
     InteractionCue CurrentInteractionCue()
     {
+        if(restSeat>=0)return new InteractionCue{category=2,target=restBenchSpots[restSeat].pos,ready=true,action="起身繼續散步",detail="E／Space／Esc 或移動起身；時間照常，不跨日、不消耗材料。"};
         if(data.holding)
         {
             if(data.heldGuest<0||data.heldGuest>=data.guests.Count)return null;
@@ -40,6 +41,7 @@ public partial class MountainTeaGame
         if(s.kind==16)cue.action="查看休息選項";
         if(s.kind==20||s.kind==21){cue.category=4;cue.action=s.kind==20?"前往瀑布山路":"返回河童溪谷";cue.ready=!data.night&&!trial;cue.detail=cue.ready?"按 E 切換地圖；沒有倒數或旅行費。":"先結束營業，再出發。";}
         if(s.kind==25){cue.category=2;cue.action="閱讀觀景記錄";cue.detail="查看山中風景，把發現留在旅行手帳。";}
+        if(s.kind==31){cue.action="坐下小憩";cue.ready=CanTrailRest(s);cue.detail=data.holding||data.lunchState==2?"先放回托盤或送達／收回便當，再休息。":"坐下聽山風；E／Space／Esc 或移動起身，不會跨日。";}
         if(s.kind>=28&&s.kind<=30){cue.category=5;cue.action="查看巡山線索";cue.ready=data.onTrail&&!data.night;cue.detail=cue.ready?s.name+" · 查看後推進筆記故事。":"白天再查看線索。";}
         if(s.kind==22&&data.notebookStage==4){cue.category=5;cue.action="歸還巡山筆記";cue.ready=data.onTrail&&!data.night;cue.detail=cue.ready?"交給椛，領取原有的委託報酬。":"白天再歸還筆記。";}
         else if(s.kind==22&&data.lunchState==2){cue.category=3;cue.action="送達巡山便當";cue.ready=data.onTrail&&!data.night;cue.detail=cue.ready?"交付已打包的菇飯，領取原有報酬。":"白天到山路送達便當。";}

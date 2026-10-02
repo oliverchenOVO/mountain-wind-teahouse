@@ -96,6 +96,7 @@ public partial class MountainTeaGame : MonoBehaviour
         chime=Tone(660,.24f);pickupSound=Tone(880,.12f);bgm=Music();
         musicSource=gameObject.AddComponent<AudioSource>();musicSource.clip=bgm;musicSource.loop=true;musicSource.volume=.12f;musicSource.Play();
         BuildLivingMountain();
+        BuildTrailRestActions();
         BuildRainWeather();
         BuildTeaLife();
         BuildUpgradeArt();
@@ -152,6 +153,7 @@ public partial class MountainTeaGame : MonoBehaviour
             else if(planning){Save(false);planning=false;}
             else if(travelBook)travelBook=false;
             else if(notebook) notebook=false;
+            else if(restSeat>=0)EndTrailRest();
             else if(started&&!result) paused=!paused;
         }
         if(started&&!paused&&!modal&&!result&&!brewing&&Input.GetKeyDown(KeyCode.Tab)){if(travelBook){travelBook=false;notebook=true;}else if(planning){Save(false);planning=false;notebook=true;}else if(relationships){relationships=false;notebook=true;}else notebook=!notebook;return;}
@@ -168,6 +170,7 @@ public partial class MountainTeaGame : MonoBehaviour
         }
         Vector3 input=new Vector3((Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow)?1:0)-(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow)?1:0),0,
             (Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow)?1:0)-(Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.DownArrow)?1:0));
+        bool restInputUsed=HandleTrailRestInput(input,Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.Space));
         float speed=Input.GetKey(KeyCode.LeftShift)?7:4.6f;
         Vector3 delta=input.normalized*speed*Time.deltaTime;
         Vector3 proposed=player.position+delta;
@@ -184,12 +187,12 @@ public partial class MountainTeaGame : MonoBehaviour
         player.position=new Vector3(player.position.x,GroundHeight(player.position.x,player.position.z),player.position.z);
         if(playerMotion)playerMotion.Walking=input.sqrMagnitude>0;
         if(input.sqrMagnitude>0) {visual.rotation=Quaternion.Slerp(visual.rotation,Quaternion.LookRotation(input),Time.deltaTime*12);walking+=Time.deltaTime*12;}
-        visual.localPosition=new Vector3(0,input.sqrMagnitude>0?Mathf.Sin(walking)*.055f:Mathf.Sin(Time.time*2)*.018f,0);
+        if(restSeat<0)visual.localPosition=new Vector3(0,input.sqrMagnitude>0?Mathf.Sin(walking)*.055f:Mathf.Sin(Time.time*2)*.018f,0);
         Vector3 target=player.position+CameraOffset;
         cam.transform.position=Vector3.Lerp(cam.transform.position,target,1-Mathf.Exp(-Time.deltaTime*5));
         if(Input.mouseScrollDelta.y!=0)cam.orthographicSize=Mathf.Clamp(cam.orthographicSize-Input.mouseScrollDelta.y,9,17);
         nearest=SelectNearestSpot();
-        if(Input.GetKeyDown(KeyCode.E)&&!trial){if(data.holding)DeliverTray();else if(nearest!=null)Interact(nearest);}
+        if(Input.GetKeyDown(KeyCode.E)&&!trial&&!restInputUsed){if(data.holding)DeliverTray();else if(nearest!=null)Interact(nearest);}
         if(trial){UpdateTrial();return;}
         if(!data.night)
         {
@@ -322,7 +325,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(data.night)foreach(var g in data.guests)if(!g.done){if(g.state>=2)PayGuest(g);else data.lost++;}
         if(data.night){data.reportDay=data.day;}
         TodayLedger().closed=true;
-        storyGuest=-1;brewing=false;ResetCookingLife();ResetAmbientTalking();RestorePavilionRoofViews();
+        EndTrailRest();storyGuest=-1;brewing=false;ResetCookingLife();ResetAmbientTalking();RestorePavilionRoofViews();
         data.day++;data.clock=0;data.night=false;data.harvested.Clear();data.guests.Clear();data.wave=0;duskNotified=false;
         data.onTrail=false;travelBook=false;SyncTrip();
         if(Friendship(2).stage==3)data.bamboo+=2;
@@ -381,6 +384,7 @@ public partial class MountainTeaGame : MonoBehaviour
         NormalizeLedger();
         data.serviceRevision=3;
         data.x=player.position.x;data.z=player.position.z;
+        if(restSeat>=0){data.x=restStandingPosition.x;data.z=restStandingPosition.z;}
         if(trial){data.x=beforeTrial.x;data.z=beforeTrial.z;}
         try
         {
@@ -436,6 +440,7 @@ public partial class MountainTeaGame : MonoBehaviour
     void OnApplicationPause(bool pause){if(pause)Save(false);}
     void ResetTransient()
     {
+        EndTrailRest();
         ResetAmbientTalking();
         RestoreTeaRoofView();
         RestorePavilionRoofViews();
@@ -506,7 +511,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.30",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.31",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -570,7 +575,7 @@ public partial class MountainTeaGame : MonoBehaviour
             if(data.night&&s.kind>=11&&s.kind<=13)continue;
             if(s.kind<3&&(data.harvested.Contains(s.id)||data.night))continue;
             if(Vector3.Distance(player.position,s.pos)>10&&s.kind<10)continue;
-            Vector3 sp=cam.WorldToScreenPoint(s.pos+Vector3.up*(s.kind>=11&&s.kind<=13||s.kind==22||s.kind==26||s.kind==27?2.4f:s==nearest?1.8f:.85f));
+            Vector3 sp=cam.WorldToScreenPoint(s.pos+Vector3.up*(s.kind==31?3.6f:s.kind>=11&&s.kind<=13||s.kind==22||s.kind==26||s.kind==27?2.4f:s==nearest?1.8f:.85f));
             if(sp.z<0)continue;
             float x=(sp.x-ox)/scale,y=(Screen.height-sp.y-oy)/scale;
             if(x<80||x>1350||y<110||y>780)continue;
@@ -767,6 +772,7 @@ public partial class MountainTeaGame : MonoBehaviour
             TestTeaPlanning();
             TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();TestServiceReadability();TestTeaNightScene();TestRiverScenery();TestTrailRestStops();
             TestPavilionRoofViews();
+            TestTrailRestActions();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -1050,6 +1056,23 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"123-pavilion-small-window.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);data.day=1;SyncWeatherPeople();player.position=TP(86,14);cam.transform.position=player.position+CameraOffset;toastTimer=0;
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"124-pavilion-roof-restored.png"));
+        yield return new WaitForSeconds(.5f);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;modal=false;paused=true;settingsOpen=true;toastTimer=0;
+        CloseAudioSettings();paused=false;NewGame();modal=false;ChangeRegion(true);player.position=TP(restBenchSpots[0].pos.x,restBenchSpots[0].pos.z-1);cam.transform.position=player.position+CameraOffset;cam.orthographicSize=8;photoMode=false;nearest=SelectNearestSpot();toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"125-rest-bench-prompt.png"));
+        yield return new WaitForSeconds(.5f);BeginTrailRest(restBenchSpots[0]);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"126-rest-lookout-seated.png"));
+        yield return new WaitForSeconds(.5f);photoMode=true;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"127-rest-lookout-photo.png"));
+        yield return new WaitForSeconds(.5f);EndTrailRest();player.position=TP(restBenchSpots[1].pos.x,restBenchSpots[1].pos.z-1);cam.transform.position=player.position+CameraOffset;BeginTrailRest(restBenchSpots[1]);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"128-rest-patrol-seated.png"));
+        yield return new WaitForSeconds(.5f);data.day=3;SyncWeatherPeople();toastTimer=0;
+        yield return new WaitForSeconds(3);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"129-rest-patrol-rain.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;Screen.SetResolution(1024,768,FullScreenMode.Windowed);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"130-rest-seated-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);HandleTrailRestInput(Vector3.zero,true);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"131-rest-standing-again.png"));
+        yield return new WaitForSeconds(.5f);BeginTrailRest(restBenchSpots[1]);Save(false);Load(Path.Combine(qaDir,"qa-save.json"));modal=false;nearest=SelectNearestSpot();toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"132-rest-load-standing.png"));
         yield return new WaitForSeconds(.5f);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

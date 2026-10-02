@@ -28,6 +28,7 @@ public partial class MountainTeaGame
     }
     GuideStep CurrentGuide()
     {
+        if(restSeat>=0)return new GuideStep("rest-bench","山中小憩","E／Space／Esc 或移動即可起身。\n時間照常，不跨日，也不消耗材料。");
         if(trial)return new GuideStep("trial","符卡練習","WASD 移動，避開紅色彈幕。\n撐過 25 秒；失敗可以再試。");
         if(fishing)return new GuideStep("fish","看準浮標","金色區域按 Space 或 E。\nEsc 收竿；失敗不損失材料。");
         if(brewing)return new GuideStep("brew","掌握火候","金色區域按 Space，製作精品。\nEsc 取消，不消耗材料。");

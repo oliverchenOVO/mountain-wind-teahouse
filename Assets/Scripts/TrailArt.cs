@@ -115,7 +115,7 @@ public partial class MountainTeaGame
             TrailShape("Pavilion paper lantern",PrimitiveType.Sphere,q,new Vector3(.38f,.54f,.38f),new Color(.95f,.71f,.34f));
             for(int hoop=0;hoop<4;hoop++)TrailShape("Lantern bamboo hoop",PrimitiveType.Cylinder,q+Vector3.up*(-.18f+hoop*.12f),new Vector3(.4f,.015f,.4f),TrailWood);
         }
-        MountainArt.WorldText(text,p+new Vector3(0,2.25f,-1.24f),.14f,TrailIvory);
+        MountainArt.WorldText(text,p+new Vector3(0,4.25f,.15f),.105f,TrailIvory);
     }
     void DetailIngredients(Spot s,int kind)
     {

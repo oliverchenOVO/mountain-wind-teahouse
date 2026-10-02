@@ -87,7 +87,7 @@ public partial class MountainTeaGame
     bool ChangeRegion(bool mountain)
     {
         if(data.night||data.holding||trial)return false;
-        RestorePavilionRoofViews();data.onTrail=mountain;player.position=mountain?TP(82,-12):ValleyGate+Vector3.back;
+        EndTrailRest();RestorePavilionRoofViews();data.onTrail=mountain;player.position=mountain?TP(82,-12):ValleyGate+Vector3.back;
         cam.transform.position=player.position+CameraOffset;modal=false;nearest=null;travelBook=false;ResetAmbientTalking();
         if(mountain)data.trailVisited=true;SyncTrip();Save(false);Notify(mountain?"瀑布山路 · 山栗與野莓每天更新，便當沒有倒數限制。":"回到河童溪谷，可以備餐與營業了。",6);return true;
     }
@@ -117,6 +117,7 @@ public partial class MountainTeaGame
     }
     void InteractTrip(Spot s)
     {
+        if(s.kind==31){if(!BeginTrailRest(s))Notify(data.holding||data.lunchState==2?"先放回托盤或送達／收回便當，再坐下小憩。":"現在無法坐下，請走近長凳再試。");return;}
         if(s.kind>=28&&s.kind<=30){FindNotebookClue(s);return;}
         if(s.kind==22&&data.notebookStage==4){ReturnNotebook();return;}
         if(s.kind==20||s.kind==21){if(!ChangeRegion(s.kind==20))Notify("先結束營業或放回送餐托盤，再出發。");return;}
