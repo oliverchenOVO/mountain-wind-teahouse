@@ -69,7 +69,7 @@ public partial class MountainTeaGame
             if(Button(x+20,590,295,data.festivalShared[i]?"已分享 ✓":"分享料理",ready)){planning=false;if(!ShareFestival(i))planning=true;}
         }
         Text(190,686,1050,70,"錯過不失敗，邀請進度跨次保留；不影響夜間營業或友人故事。\n三份料理與謝禮只計一次；完成後仍會每七天掛起燈籠，不重複發獎勵。",small);
-        if(Button(190,750,340,"去每日菜單備餐"))planningTab=0;
+        if(Button(190,750,340,"去每日菜單備餐"))SelectPlanningTab(0);
     }
     void DrawFestivalHUD()
     {

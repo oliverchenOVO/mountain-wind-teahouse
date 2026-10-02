@@ -56,7 +56,7 @@ public partial class MountainTeaGame
         if(Button(190,715,235,"← 較早一天",ledgerOffset<data.ledger.Count-1))ledgerOffset++;
         if(Button(440,715,235,"較新一天 →",ledgerOffset>0))ledgerOffset--;
         if(Button(690,715,235,"回到今日"))ledgerOffset=0;
-        if(Button(940,715,300,"查看營業結算"))planningTab=2;
+        if(Button(940,715,300,"查看營業結算"))SelectPlanningTab(2);
         Text(190,763,1040,28,"帳本只供查看，不發錢、不收費，也不改變原有獎勵與交易。",small);
     }
     void TestLedger()

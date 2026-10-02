@@ -79,7 +79,11 @@ public partial class MountainTeaGame
         SyncUpgradeArt();
     }
     GameObject Decor(string n,PrimitiveType type,Vector3 pos,Vector3 scale,Color color){return TeaHouseWorld.Shape(n,type,pos,scale,color,gardenDecor.transform);}
-    void OpenPlanning(int tab=0){NormalizePlanning();if(tab==7)ledgerOffset=0;planning=true;planningTab=tab;notebook=false;travelBook=false;modal=false;eventFriend=-1;}
+    void OpenPlanning(int tab=-1)
+    {
+        if(tab<-1||tab>=PlanningTabs.Length)return;
+        NormalizePlanning();SelectPlanningTab(tab<0?Mathf.Clamp(lastPlanningTab,0,7):tab,tab==7);planning=true;notebook=false;travelBook=false;modal=false;eventFriend=-1;ResetAmbientTalking();
+    }
     string ReportSummary()
     {
         NormalizePlanning();int best=0;for(int d=1;d<DishNames.Length;d++)if(data.sales[d]>data.sales[best])best=d;
@@ -89,27 +93,29 @@ public partial class MountainTeaGame
     void DrawPlanning()
     {
         Box(new Rect(0,0,1440,900),new Color(0,0,0,.4f));Panel(new Rect(155,105,1130,695));
-        Text(190,126,700,40,"茶屋計畫 · "+data.money+" 文",heading);
+        Text(190,126,570,40,"茶屋計畫 · "+data.money+" 文",heading);Text(770,139,300,28,"F1 菜單 · F2 雜貨 · F3 火候",small);
         if(Button(1080,125,170,"收起 [Esc]")){Save(false);planning=false;}
-        for(int t=0;t<8;t++)if(Button(190+t*133,183,123,new[]{"每日菜單","庭院裝修","營業結算","七日手帖","茶屋升級","小祭典","材料雜貨","帳本"}[t])){planningTab=t;if(t==7)ledgerOffset=0;}
+        for(int t=0;t<8;t++)if(TeaButton(new Rect(190+t*133,183,123,42),PlanningTabs[t],true,planningTab==t?sage:Color.Lerp(sage,cream,.35f)))SelectPlanningTab(t);
         if(planningTab==0)
         {
             Text(190,237,1050,74,SpecialSummary()+"　"+(data.night?"今晚菜單已鎖定":"目標數量只作提醒，不自動扣材料"),small);
             for(int d=0;d<DishNames.Length;d++)
             {
                 float y=320+d*52;bool unlocked=RecipeUnlocked(d);
-                Text(190,y,235,32,DishNames[d]+(d==DailyDish()?" ★":""),heading);Text(430,y,250,52,unlocked?Recipes[d]+"\n售價 "+Prices[d]+" 文 · 庫存 "+Stock(d):d>=5?"首次送達巡山便當解鎖":"完成"+(d==3?"荷取":"文")+"故事第一段解鎖",small);
+                if(TeaButton(new Rect(190,y,235,42),(prepFocus==d?"› ":"")+DishNames[d]+(d==DailyDish()?" ★":""),unlocked,prepFocus==d?sage:Color.Lerp(sage,cream,.35f)))FocusRecipe(d);
+                Text(430,y,250,52,unlocked?Recipes[d]+"\n售價 "+Prices[d]+" 文 · 庫存 "+Stock(d):d>=5?"首次送達巡山便當解鎖":"完成"+(d==3?"荷取":"文")+"故事第一段解鎖",small);
                 if(Button(705,y,135,OnMenu(d)?"供應 ✓":"不上架",!data.night&&unlocked))SetMenu(d,!data.menu[d]);
                 Text(860,y+8,110,30,"目標 "+data.prepTargets[d],small);
                 if(Button(968,y,45,"−",!data.night)){data.prepTargets[d]=Mathf.Max(0,data.prepTargets[d]-1);Save(false);}
                 if(Button(1018,y,45,"＋",!data.night)){data.prepTargets[d]=Mathf.Min(20,data.prepTargets[d]+1);Save(false);}
-                if(Button(1080,y,data.prepUpgrade?76:160,data.prepUpgrade?"火候":"製作",unlocked&&NearTea()&&!data.holding)){planning=false;BeginBrew(d);}
-                if(data.prepUpgrade&&Button(1163,y,80,"備"+BatchCount(d)+"份",CanImprove()&&BatchCount(d)>0))MakeBatch(d);
+                if(Button(1080,y,data.prepUpgrade?76:160,data.prepUpgrade?"火候":prepFocus==d?"製作 F3":"製作",CanStartPlanningBrew(d)))StartPlanningBrew(d);
+                if(data.prepUpgrade&&Button(1163,y,80,"備"+BatchCount(d)+"份",CanImprove()&&BatchCount(d)>0)){FocusRecipe(d);MakeBatch(d);}
             }
-            Text(190,690,1050,28,"上架料理 "+MenuStock()+" 份（至少 3 份開店）。推薦可不上架，客人只點菜單內料理。",small);
-            Text(190,718,1050,28,"常見口味：文喜歡清茶 · 荷取喜歡菇飯 · 椛喜歡鹽燒。今晚以客人的實際點單為準。",small);
+            Text(190,690,1050,28,PrepFocusSummary(),small);
+            Text(190,718,1050,28,"上架料理 "+MenuStock()+" 份（3 份開店）· 文偏愛清茶／荷取菇飯／椛鹽燒，仍以實際點單為準。",small);
             if(Button(190,750,340,"儲存備餐計畫"))Save();
             if(Button(550,750,340,"開店",!data.night&&NearTea()&&MenuStock()>=3)){planning=false;OpenShop();}
+            if(Button(910,750,330,"材料雜貨 [F2]"))SelectPlanningTab(6);
         }
         else if(planningTab==1)
         {

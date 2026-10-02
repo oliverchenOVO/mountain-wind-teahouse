@@ -48,14 +48,16 @@ public partial class MountainTeaGame
         for(int i=0;i<6;i++)
         {
             float y=350+i*57;bool unlocked=SupplyUnlocked(i);int left=SupplyLeft(i);
+            int missing=FocusedNeed(i);if(missing>0)RoundFill(new Rect(190,y-2,1050,48),new Color(gold.r,gold.g,gold.b,.15f));
             Text(195,y,215,35,SupplyNames[i],heading);
             Text(420,y+4,285,32,unlocked?"單價 "+SupplyPrices[i]+" 文 · 持有 "+SupplyHeld(i):"首次巡山便當送達後供應",small);
-            Text(715,y+4,180,32,unlocked?"剩 "+left+" / "+SupplyLimits[i]+" 份":"山路補給未解鎖",small);
+            Text(715,y+4,180,32,unlocked?"剩 "+left+" / "+SupplyLimits[i]+(missing>0?" · 缺 "+missing:""):"山路補給未解鎖",small);
             if(Button(905,y,145,"買 1 · "+SupplyPrices[i]+" 文",CanBuySupply(i,1)))BuySupply(i,1);
             if(Button(1065,y,175,"買 3 · "+SupplyPrices[i]*3+" 文",CanBuySupply(i,3)))BuySupply(i,3);
         }
-        Text(190,704,1050,40,"只買材料，不出售成品或回收物品；不算採集茶印，也不改變料理品質與夜間報表。",small);
-        if(Button(190,750,340,"返回每日菜單備餐"))planningTab=0;
+        Text(190,700,1050,45,PrepFocusSummary()+"\n只買材料；切頁不扣款，不算採集茶印，也不改料理品質與夜間報表。",small);
+        if(Button(190,750,340,"返回每日菜單 [F1]"))SelectPlanningTab(0);
+        if(Button(550,750,340,"火候 · "+ShortDishes[prepFocus]+" [F3]",CanStartPlanningBrew(prepFocus)))StartPlanningBrew(prepFocus);
     }
     void BuildSupplyCart()
     {

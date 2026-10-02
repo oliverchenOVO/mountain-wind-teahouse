@@ -79,7 +79,7 @@ public partial class MountainTeaGame
         if(data.guideHidden)return;
         Text(43,184,294,66,step.text,small);Text(43,252,294,24,GuideDirection(step),small);
         if(Button(25,737,285,step.page==1?"引導 · 打開茶屋計畫":step.page==2?"引導 · 打開旅行手帳":"引導 · 查看地圖"))
-        {if(step.page==1)OpenPlanning();else if(step.page==2){travelBook=true;notebook=false;}else notebook=true;}
+        {if(step.page==1)OpenPlanning(0);else if(step.page==2){travelBook=true;notebook=false;}else notebook=true;}
     }
     void TestContextGuide()
     {

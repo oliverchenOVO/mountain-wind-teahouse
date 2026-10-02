@@ -144,8 +144,9 @@ public partial class MountainTeaGame
     void DrawTravelBook()
     {
         Box(new Rect(0,0,1440,900),new Color(0,0,0,.4f));Panel(new Rect(175,130,1090,635));
-        Text(210,155,850,40,"旅行手帳 · 瀑布山路",heading);if(Button(1060,150,170,"收起 [Esc]")){travelBook=false;notebook=false;}
-        if(Button(210,198,225,"便當與地圖"))travelTab=0;if(Button(455,198,245,"巡山筆記事件"))travelTab=1;
+        Text(210,155,500,40,"旅行手帳 · 瀑布山路",heading);Text(740,167,300,28,"同次遊玩保留上次頁籤",small);if(Button(1060,150,170,"收起 [Esc]")){travelBook=false;notebook=false;}
+        if(TeaButton(new Rect(210,198,225,42),"便當與地圖",true,travelTab==0?sage:Color.Lerp(sage,cream,.35f)))SelectTravelTab(0);
+        if(TeaButton(new Rect(455,198,245,42),"巡山筆記事件",true,travelTab==1?sage:Color.Lerp(sage,cream,.35f)))SelectTravelTab(1);
         if(travelTab==1){DrawNotebookQuest();return;}
         Rect map=new Rect(210,250,490,380);Box(map,new Color(.66f,.76f,.6f));Box(new Rect(map.x+221,map.y,42,map.height),new Color(.31f,.65f,.69f));
         Box(new Rect(map.x+215,map.y+201,54,23),new Color(.58f,.4f,.24f));

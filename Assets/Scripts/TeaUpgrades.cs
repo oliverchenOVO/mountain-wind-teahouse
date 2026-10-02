@@ -45,7 +45,7 @@ public partial class MountainTeaGame
             if(Button(x+25,585,455,UpgradeOwned(i)?"已升級":"購買 · "+UpgradeCosts[i]+" 文",CanImprove()&&!UpgradeOwned(i)&&data.money>=UpgradeCosts[i]))BuyUpgrade(i);
         }
         Text(190,681,1040,90,"備餐手冊用法：每日菜單設定目標，再點「備 N 份」。材料不足時只做得出的份數。\n已達目標、未上架、營業中或端著托盤／便當時不會製作，也不會扣材料。\n原有庭院裝修仍是外觀選擇；兩項便利升級不影響七日手帖的庭院目標。",small);
-        if(Button(190,750,340,"返回每日菜單"))planningTab=0;
+        if(Button(190,750,340,"返回每日菜單"))SelectPlanningTab(0);
     }
     void TestTeaUpgrades()
     {
