@@ -136,7 +136,7 @@ public partial class MountainTeaGame
         SyncSupplyCart();
         TickTeaLife(Time.deltaTime);
         TickLivingMountain(Time.deltaTime);UpdateMountainAudio(Time.deltaTime);UpdateInteractionMarker();
-        foreach(var r in trailCanopies)if(r){Vector3 p=r.transform.position;r.enabled=!(data.onTrail&&Mathf.Abs(p.x-player.position.x)<3.5f&&p.z<player.position.z&&p.z>player.position.z-7);}
+        TickCanopyViews(Time.deltaTime);
     }
     string LunchStatus(){return data.lunchState==2?"已打包 → 送到天狗哨所":data.lunchState==1?"已接取 → 茶屋打包菇飯 ×1":data.lunchState==3?"已完成，下一天可再接":"尚未接取";}
     void DrawTravelBook()

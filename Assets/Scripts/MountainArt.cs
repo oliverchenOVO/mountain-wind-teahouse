@@ -25,7 +25,7 @@ public static class MountainArt
         var batch=new List<GameObject>();
         foreach(var r in root.GetComponentsInChildren<MeshRenderer>())
         {
-            if(r.name=="Tea sign"||r.GetComponent<TextMesh>()||r.GetComponent<NorenWind>()||r.GetComponent<WaterRibbon>()||r.GetComponentInParent<WaterwheelSpin>())continue;
+            if(MountainTeaGame.IsViewCanopy(r.name)||r.name=="Tea sign"||r.GetComponent<TextMesh>()||r.GetComponent<NorenWind>()||r.GetComponent<WaterRibbon>()||r.GetComponentInParent<WaterwheelSpin>())continue;
             batch.Add(r.gameObject);
         }
         StaticBatchingUtility.Combine(batch.ToArray(),root.gameObject);

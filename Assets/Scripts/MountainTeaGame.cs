@@ -101,6 +101,7 @@ public partial class MountainTeaGame : MonoBehaviour
         BuildUpgradeArt();
         BuildFestival();
         BuildSupplyCart();
+        BuildCanopyViews();
         CreatePortraits();
         LoadAudioPreferences();
         if(qa) StartCoroutine(QARun());
@@ -755,7 +756,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -891,6 +892,16 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);Load(Path.Combine(qaDir,"legacy-player-save.json"));OpenPlanning(7);toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"57-ledger-legacy-partial.png"));
         yield return new WaitForSeconds(.5f);planning=false;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;player.position=new Vector3(-16,0,-4);cam.transform.position=player.position+CameraOffset;cam.orthographicSize=9;photoMode=true;toastTimer=0;qaOpaqueCanopies=true;RestoreCanopyViews();
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"58-canopies-before.png"));
+        yield return new WaitForSeconds(.5f);qaOpaqueCanopies=false;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"59-canopies-clear-teahouse.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;Screen.SetResolution(1024,768,FullScreenMode.Windowed);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"60-clear-view-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ChangeRegion(true);var focusCrown=canopyViews.Find(v=>v.renderer.name=="Faceted mountain canopy");player.position=TP(focusCrown.bounds.center.x,focusCrown.bounds.center.z+2);cam.transform.position=player.position+CameraOffset;photoMode=true;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"61-clear-view-mountain.png"));
+        yield return new WaitForSeconds(.5f);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
