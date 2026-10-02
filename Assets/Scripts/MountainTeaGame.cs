@@ -22,6 +22,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public int weekStartDay,weekHarvest,weekCraft,weekServed;public bool[] weekClaimed;
         public int specialDay,specialDish,nightSpecialIncome;
         public bool comfortUpgrade,prepUpgrade;
+        public bool guideHidden;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -483,7 +484,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.13",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.14",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -533,8 +534,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(Button(25,681,285,"推薦備餐 · "+ShortDishes[DailyDish()]+" ＋6"))OpenPlanning();
         if(data.onTrail)Text(35,345,300,95,"瀑布山路\n"+LunchStatus()+"\n山栗 "+data.chestnuts+" · 野莓 "+data.berries,small);
         if(data.notebookStage>0&&data.notebookStage<6){Panel(new Rect(25,455,330,135));Text(42,468,298,30,"巡山筆記 · 下一步",heading);Text(42,511,298,72,NotebookHint(),small);}
-        Panel(new Rect(25,125,285,155));Text(45,141,250,36,data.onTrail?"山路小旅行":data.restored?"山中友人的日常":"今天的小目標",heading);
-        Text(45,186,245,78,data.onTrail?LunchStatus()+"\n採集山栗與野莓\n尋找瀑布觀景亭":data.restored?"招待料理提升好感\n白天拜訪，推進角色故事\nTab 查看故事與解鎖獎勵":!data.questDone?"過橋找荷取，收集 4 份竹筍\n備餐 → 開店 → 修繕招牌":"荷取委託完成 ✓\n營業與角色故事可一起推進",small);
+        DrawContextGuide();
         TeaTag(new Rect(25,840,540,36),"WASD 移動 · Shift 跑步 · E 互動 · 滾輪縮放",new Color(.12f,.22f,.19f,.92f));
         if(saveBadgeTimer>0)TeaTag(new Rect(1220,842,190,34),"進度已保存",sage);
     }
@@ -738,7 +738,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -823,6 +823,17 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);OpenPlanning(4);
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"37-upgrades-small-window.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);planning=false;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;data.guideHidden=false;toastTimer=0;cam.transform.position=player.position+CameraOffset;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"38-context-foraging.png"));
+        yield return new WaitForSeconds(.5f);data.tea=4;data.meal=3;data.grilled=2;player.position=new Vector3(-12,0,-3);OpenShop();
+        yield return new WaitForSeconds(4);PickTray(0,0);player.position=new Vector3(-12,0,-6);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"39-context-delivery.png"));
+        yield return new WaitForSeconds(.5f);ReturnTray();NextDay();modal=false;data.meal=1;player.position=new Vector3(-12,0,-3);AcceptLunch();PackLunch();ChangeRegion(true);toastTimer=0;cam.transform.position=player.position+CameraOffset;
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"40-context-small-window.png"));
+        yield return new WaitForSeconds(.5f);data.guideHidden=true;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"41-guide-collapsed.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);data.guideHidden=false;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
