@@ -24,6 +24,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public bool comfortUpgrade,prepUpgrade;
         public bool guideHidden;
         public bool[] festivalShared;public bool festivalRewardClaimed;
+        public int supplyDay,supplySpent;public int[] supplyBought;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -98,6 +99,7 @@ public partial class MountainTeaGame : MonoBehaviour
         BuildTeaLife();
         BuildUpgradeArt();
         BuildFestival();
+        BuildSupplyCart();
         CreatePortraits();
         LoadAudioPreferences();
         if(qa) StartCoroutine(QARun());
@@ -373,6 +375,7 @@ public partial class MountainTeaGame : MonoBehaviour
         NormalizeWeek();
         NormalizeSpecial();
         NormalizeFestival();
+        NormalizeSupplies();
         data.serviceRevision=3;
         data.x=player.position.x;data.z=player.position.z;
         if(trial){data.x=beforeTrial.x;data.z=beforeTrial.z;}
@@ -398,6 +401,7 @@ public partial class MountainTeaGame : MonoBehaviour
             NormalizeWeek();
             NormalizeSpecial();
             NormalizeFestival();
+            NormalizeSupplies();
             if(!Walkable(new Vector3(data.x,0,data.z))){data.onTrail=false;data.x=-6;data.z=-7;}
             player.position=new Vector3(data.x,GroundHeight(data.x,data.z),data.z);SyncTrip();
             foreach(var s in spots)if(s.kind<3)s.visual.SetActive(!data.harvested.Contains(s.id));
@@ -599,7 +603,7 @@ public partial class MountainTeaGame : MonoBehaviour
         else if(speaker=="茶屋料理台")
         {
             for(int d=0;d<3;d++) if(Button(365+d*240,535,226,"製作 "+DishNames[d]))BeginBrew(d);
-            if(Button(365,583,710,"菜單、解鎖食譜與庭院裝修"))OpenPlanning();
+            if(Button(365,583,710,"菜單、材料雜貨與庭院裝修"))OpenPlanning();
             if(Button(365,633,350,data.night?"正在營業":"開店，迎接傍晚",!data.night))OpenShop();
         }
         else if(speaker=="河城荷取"&&!data.questDone)
@@ -746,7 +750,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -848,6 +852,16 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"43-visible-teahouse-upgrades.png"));
         yield return new WaitForSeconds(.5f);BuyGarden(0,1,true);toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"44-bamboo-upgrade-palette.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;player.position=new Vector3(-12,0,-3);data.money=180;OpenPlanning(6);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"50-material-supplies.png"));
+        yield return new WaitForSeconds(.5f);BuySupply(0,3);BuySupply(0,3);data.trailRecipes=true;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"51-supplies-purchased.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"52-supplies-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);planning=false;photoMode=true;player.position=new Vector3(-16,0,-4);cam.transform.position=player.position+CameraOffset;cam.orthographicSize=9;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"53-teahouse-supply-cart.png"));
         yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;
         yield return new WaitForSeconds(.5f);NewGame();modal=false;data.tea=6;data.meal=3;data.grilled=3;player.position=new Vector3(-12,0,-5);OpenShop();
         yield return new WaitForSeconds(4);Serve(0,0);Serve(1,1);Serve(2,2);player.position=new Vector3(-12,0,-6);cam.transform.position=new Vector3(-13,0,-8)+CameraOffset;cam.orthographicSize=6;photoMode=true;toastTimer=0;

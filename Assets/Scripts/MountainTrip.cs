@@ -133,6 +133,7 @@ public partial class MountainTeaGame
     void LateUpdate()
     {
         TickRainWeather(Time.deltaTime);
+        SyncSupplyCart();
         TickTeaLife(Time.deltaTime);
         TickLivingMountain(Time.deltaTime);UpdateMountainAudio(Time.deltaTime);UpdateInteractionMarker();
         foreach(var r in trailCanopies)if(r){Vector3 p=r.transform.position;r.enabled=!(data.onTrail&&Mathf.Abs(p.x-player.position.x)<3.5f&&p.z<player.position.z&&p.z>player.position.z-7);}
