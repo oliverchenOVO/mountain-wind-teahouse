@@ -152,20 +152,15 @@ public partial class MountainTeaGame
         if(TeaButton(new Rect(210,198,225,42),"便當與地圖",true,travelTab==0?sage:Color.Lerp(sage,cream,.35f)))SelectTravelTab(0);
         if(TeaButton(new Rect(455,198,245,42),"巡山筆記事件",true,travelTab==1?sage:Color.Lerp(sage,cream,.35f)))SelectTravelTab(1);
         if(travelTab==1){DrawNotebookQuest();return;}
-        Rect map=new Rect(210,250,490,380);Box(map,new Color(.66f,.76f,.6f));Box(new Rect(map.x+221,map.y,42,map.height),new Color(.31f,.65f,.69f));
-        Box(new Rect(map.x+215,map.y+201,54,23),new Color(.58f,.4f,.24f));
-        Vector3[] positions={new Vector3(82,0,-13),new Vector3(89,0,-5),new Vector3(103,0,5),new Vector3(112,0,12),new Vector3(106,0,18),new Vector3(86,0,21)};
-        string[] names={"返回溪谷","文 · 拍照","荷取 · 水路","山栗／野莓","椛 · 哨所","觀景亭"};
-        positions[1]=spots.Find(s=>s.kind==26).pos;positions[2]=spots.Find(s=>s.kind==27).pos;positions[4]=spots.Find(s=>s.kind==22).pos;
-        for(int i=0;i<positions.Length;i++){float x=map.x+(positions[i].x-77)/42*map.width,y=map.y+(25-positions[i].z)/41*map.height;Box(new Rect(x-4,y-4,8,8),gold);Text(x+10,y-14,210,30,names[i],small);}
-        if(data.onTrail){float x=map.x+(player.position.x-77)/42*map.width,y=map.y+(25-player.position.z)/41*map.height;Box(new Rect(x-5,y-5,10,10),ink);}
+        DrawTravelMap();
         Text(760,230,430,35,"巡山便當",heading);Text(760,270,435,32,LunchStatus(),small);
         Text(760,309,435,96,"指定竹筍菇飯 ×1，報酬 100 文。\n首次送達解鎖栗子飯與莓果茶。\n沒有倒數，便當可跨日保留。\n山栗 "+data.chestnuts+" · 野莓 "+data.berries,small);
         if(Button(760,413,435,"接下委託",!data.night&&(data.lunchState==0||data.lunchState==3)&&data.lunchDay!=data.day))AcceptLunch();
         if(Button(760,465,435,"在茶屋打包菇飯",data.lunchState==1&&NearTea()&&data.meal>0))PackLunch();
         if(Button(760,517,435,"拆開便當，退回料理",data.lunchState==2&&NearTea()))UnpackLunch();
         Text(760,582,440,95,"發現：\n"+(data.photoVisited?"✓ 文的拍照點  ":"□ 文的拍照點  ")+(data.waterVisited?"✓ 水路":"□ 水路")+"\n"+(data.lookoutVisited?"✓ 瀑布觀景亭":"□ 瀑布觀景亭"),small);
-        Text(210,683,990,42,"溪谷東北出口進入山路 → 小橋 → 果實小徑 → 哨所。營業前請先返回茶屋。",small);
+        Text(210,678,990,28,TravelMapLocation(),small);
+        Text(210,711,990,28,"示意地圖，非自動尋路 · 小橋西側支線通往觀景亭；營業前請先返回茶屋。",small);
     }
     void TestMountainTrip()
     {
