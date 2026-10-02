@@ -76,6 +76,7 @@ public partial class MountainTeaGame
                 }
             }
         }
+        SyncUpgradeArt();
     }
     GameObject Decor(string n,PrimitiveType type,Vector3 pos,Vector3 scale,Color color){return TeaHouseWorld.Shape(n,type,pos,scale,color,gardenDecor.transform);}
     void OpenPlanning(int tab=0){NormalizePlanning();planning=true;planningTab=tab;notebook=false;travelBook=false;modal=false;eventFriend=-1;}
