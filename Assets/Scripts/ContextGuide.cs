@@ -61,7 +61,7 @@ public partial class MountainTeaGame
         if(kind==23||kind==24)return GuideTo("mountain","去山路找食材","需要"+(kind==23?"山栗":"野莓")+"；東北入口按 E 上山。\n備好料理後再回茶屋。",GuideSpot(20).pos,2);
         var ingredient=GuideSpot(kind);
         if(ingredient==null)return GuideTo("rest","今天已採完","回房休息，明天採集物會重新長好。\n材料與料理保留，也能改做別的餐點。",GuideSpot(16).pos,1);
-        return GuideTo("forage",kind==14?"到溪邊釣魚":"先找一點食材","準備 "+DishNames[dish]+"：需要"+ingredient.name+"。\n靠近金色互動標記，按 E。",ingredient.pos);
+        return GuideTo("forage",kind==14?"到溪邊釣魚":"先找一點食材","準備 "+DishNames[dish]+"：需要"+ingredient.name+"。\n靠近地面互動標記，依動作卡按 E。",ingredient.pos);
     }
     string GuideDirection(GuideStep step)
     {

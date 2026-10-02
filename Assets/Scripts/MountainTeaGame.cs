@@ -182,15 +182,7 @@ public partial class MountainTeaGame : MonoBehaviour
         Vector3 target=player.position+CameraOffset;
         cam.transform.position=Vector3.Lerp(cam.transform.position,target,1-Mathf.Exp(-Time.deltaTime*5));
         if(Input.mouseScrollDelta.y!=0)cam.orthographicSize=Mathf.Clamp(cam.orthographicSize-Input.mouseScrollDelta.y,9,17);
-        nearest=null;float distance=2.2f;
-        foreach(var s in spots)
-        {
-            if(!VisibleLivingSpot(s))continue;
-            if((s.kind==23||s.kind==24)&&data.harvested.Contains(s.id))continue;
-            if(data.night&&s.kind>=11&&s.kind<=13)continue;
-            if(s.kind<3&&(data.night||data.harvested.Contains(s.id))) continue;
-            float d=Vector3.Distance(player.position,s.pos);if(d<distance){nearest=s;distance=d;}
-        }
+        nearest=SelectNearestSpot();
         if(Input.GetKeyDown(KeyCode.E)&&!trial){if(data.holding)DeliverTray();else if(nearest!=null)Interact(nearest);}
         if(trial){UpdateTrial();return;}
         if(!data.night)
@@ -519,7 +511,7 @@ public partial class MountainTeaGame : MonoBehaviour
         else
         {
             GUI.enabled=!modal&&!paused&&!notebook&&!result&&!brewing&&!relationships&&!planning&&!travelBook;DrawHUD();GUI.enabled=true;
-            if(!modal&&!paused&&!notebook&&!result&&!trial&&!brewing&&!relationships&&!planning&&!travelBook){DrawWorldLabels(scale,ox,oy);DrawTableOrders();}
+            if(!modal&&!paused&&!notebook&&!result&&!trial&&!brewing&&!relationships&&!planning&&!travelBook){DrawWorldLabels(scale,ox,oy);DrawTableOrders();DrawInteractionFeedback();}
             if(data.night&&!paused&&!notebook&&!result&&!brewing&&!relationships&&!planning&&!travelBook)DrawCompactGuests();
             if(trial){Panel(new Rect(470,120,500,85));Text(490,134,460,35,"椛的符卡練習   "+Mathf.CeilToInt(trialTimer)+" 秒",heading);Text(490,171,460,26,"剩餘機會："+hearts+"    WASD 閃避紅色彈幕",small);}
             if(fishing)DrawFishing();
@@ -564,7 +556,7 @@ public partial class MountainTeaGame : MonoBehaviour
             if(data.night&&s.kind>=11&&s.kind<=13)continue;
             if(s.kind<3&&(data.harvested.Contains(s.id)||data.night))continue;
             if(Vector3.Distance(player.position,s.pos)>10&&s.kind<10)continue;
-            Vector3 sp=cam.WorldToScreenPoint(s.pos+Vector3.up*(s.kind>=11&&s.kind<=13||s.kind==22||s.kind==26||s.kind==27?2.4f:.85f));
+            Vector3 sp=cam.WorldToScreenPoint(s.pos+Vector3.up*(s.kind>=11&&s.kind<=13||s.kind==22||s.kind==26||s.kind==27?2.4f:s==nearest?1.8f:.85f));
             if(sp.z<0)continue;
             float x=(sp.x-ox)/scale,y=(Screen.height-sp.y-oy)/scale;
             if(x<80||x>1350||y<110||y>780)continue;
@@ -576,7 +568,8 @@ public partial class MountainTeaGame : MonoBehaviour
             if(s!=nearest&&(!actor||Vector3.Distance(player.position,s.pos)>7))continue;
             Rect tag=new Rect(x-(s==nearest?105:82),y-15,s==nearest?210:164,34);bool overlap=false;
             foreach(var used in labelRects)if(new Rect(used.x-8,used.y-8,used.width+16,used.height+16).Overlaps(tag)){overlap=true;break;}if(overlap)continue;
-            labelRects.Add(tag);TeaTag(tag,s==nearest?"[E] "+s.name:s.name,s==nearest?sage:new Color(.15f,.23f,.20f,.85f));
+            var cue=!data.holding&&s==nearest?CurrentInteractionCue():null;
+            labelRects.Add(tag);TeaTag(tag,cue!=null?CueCategories[cue.category]+" · "+s.name:s.name,cue!=null?Color.Lerp(CueColors[cue.category],ink,.6f):new Color(.15f,.23f,.20f,.85f));
         }
     }
     void DrawGuests()
@@ -756,7 +749,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -902,6 +895,23 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);ChangeRegion(true);var focusCrown=canopyViews.Find(v=>v.renderer.name=="Faceted mountain canopy");player.position=TP(focusCrown.bounds.center.x,focusCrown.bounds.center.z+2);cam.transform.position=player.position+CameraOffset;photoMode=true;toastTimer=0;
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"61-clear-view-mountain.png"));
         yield return new WaitForSeconds(.5f);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;player.position=spots.Find(s=>s.kind==0).pos+Vector3.back*.7f;cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"62-action-harvest.png"));
+        yield return new WaitForSeconds(.5f);player.position=spots[1].pos+Vector3.back;cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"63-action-dialogue.png"));
+        yield return new WaitForSeconds(.5f);player.position=spots[0].pos+Vector3.back;cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"64-action-facility.png"));
+        yield return new WaitForSeconds(.5f);data.tea=3;OpenShop();modal=false;
+        yield return new WaitForSeconds(4);PickTray(0,0);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"65-action-delivery-distant.png"));
+        yield return new WaitForSeconds(.5f);player.position=new Vector3(-16,0,-10.2f);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"66-action-delivery-ready.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"67-action-small-window.png"));
+        yield return new WaitForSeconds(.5f);ReturnTray();NewGame();modal=false;Screen.SetResolution(1440,900,FullScreenMode.Windowed);ChangeRegion(true);data.notebookStage=1;SyncNotebook();player.position=spots.Find(s=>s.kind==28).pos+Vector3.back*.7f;cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"68-action-notebook-clue.png"));
+        yield return new WaitForSeconds(.5f);ChangeRegion(false);player.position=ValleyGate;cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"69-action-travel.png"));
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

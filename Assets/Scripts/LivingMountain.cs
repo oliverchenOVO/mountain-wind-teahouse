@@ -21,8 +21,7 @@ public partial class MountainTeaGame
             s.visual=TeaHouseWorld.Shape(s.name,PrimitiveType.Cube,s.pos+Vector3.up*.12f,new Vector3(.5f,.08f,.35f),i==1?new Color(.74f,.25f,.22f):cream);
             s.visual.transform.rotation=Quaternion.Euler(0,20+i*23,0);
         }
-        interactionMarker=TeaHouseWorld.Shape("Interaction ground marker",PrimitiveType.Cylinder,Vector3.zero,new Vector3(1.3f,.012f,1.3f),gold);
-        interactionMarker.SetActive(false);
+        BuildInteractionFeedback();
         if(!FindFirstObjectByType<AudioListener>())player.gameObject.AddComponent<AudioListener>();
         windAudio=Ambience("Mountain wind",NoiseLoop(11,.09f,.015f));
         streamAudio=Ambience("Nearby stream",NoiseLoop(22,.32f,.13f));
@@ -116,13 +115,12 @@ public partial class MountainTeaGame
         Text(215,440,960,55,"下一步："+NotebookHint(),body);
         if(Button(215,518,430,"接下尋找筆記的委託",data.notebookStage==0&&!data.night))AcceptNotebook();
         if(Button(675,518,430,"在茶屋閱讀最後一頁",data.notebookStage==5&&!data.onTrail&&!data.night&&NearTea()))NotebookEpilogue();
-        Text(215,585,960,100,"山中日常：文沿西岸散步拍照；荷取巡查東岸水路；椛繞行哨所與果實小徑。\n靠近角色時，她們會停下來。地圖上的角色標記會隨位置更新。\n金色腳下標記表示目前能互動的目標，按 E 即可。",small);
+        Text(215,585,960,100,"山中日常：文沿西岸散步拍照；荷取巡查東岸水路；椛繞行哨所與果實小徑。\n靠近角色時，她們會停下來。地圖上的角色標記會隨位置更新。\n地面圖案區分採集、對話、設施、送餐、移動與線索；下方卡片說明 E 的動作。",small);
     }
     bool VisibleLivingSpot(Spot s){return s.kind<28||s.kind>30||data.notebookStage==s.kind-27;}
     void UpdateInteractionMarker()
     {
-        if(!interactionMarker)return;bool show=started&&!AvatarMotion.Frozen&&!photoMode&&!trial&&nearest!=null&&VisibleLivingSpot(nearest);
-        interactionMarker.SetActive(show);if(show)interactionMarker.transform.position=nearest.pos+Vector3.up*.055f;
+        if(interactionMarker)UpdateContextMarker();
     }
     void TestLivingMountain()
     {

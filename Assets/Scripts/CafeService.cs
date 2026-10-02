@@ -108,8 +108,7 @@ public partial class MountainTeaGame
     {
         if(data.holding&&!modal&&!notebook&&!paused&&!relationships&&!planning)
         {
-            Panel(new Rect(440,720,490,110));Text(460,735,450,35,"托盤 · "+DishNames[data.heldDish]+(data.heldPerfect?"（精品）":""),heading);
-            Text(460,777,450,30,"到 "+data.guests[data.heldGuest].name+" 桌邊按 E",small);
+            // The context card and ground ring identify the actual delivery target.
             if(Button(960,760,455,"放回料理台",Vector3.Distance(player.position,new Vector3(-12,0,-2.2f))<4))ReturnTray();
         }
         if(!brewing)return;

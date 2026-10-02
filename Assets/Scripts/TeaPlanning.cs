@@ -161,7 +161,8 @@ public partial class MountainTeaGame
             var g=data.guests[i];if(g.done||g.state!=1)continue;
             Vector3 p=cam.WorldToViewportPoint(new Vector3(-16+i*3,2.5f,-9.2f));float x=p.x*1440,y=(1-p.y)*900;
             if(x<50||x>1010||y<135||y>680)continue;
-            Box(new Rect(x-68,y-28,136,30),sage);Text(x-60,y-26,125,30,(data.holding&&data.heldGuest==i?"[E] 送餐":ShortDishes[g.order]),label);
+            bool target=data.holding&&data.heldGuest==i;bool ready=Vector3.Distance(player.position,new Vector3(-16+i*3,0,-9.2f))<=2.6f;
+            Box(new Rect(x-68,y-28,136,30),sage);Text(x-60,y-26,125,30,(target?(ready?"[E] 送餐":"走近送餐"):ShortDishes[g.order]),label);
         }
     }
     void TestTeaPlanning()
