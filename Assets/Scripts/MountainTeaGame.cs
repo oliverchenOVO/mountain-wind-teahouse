@@ -103,6 +103,7 @@ public partial class MountainTeaGame : MonoBehaviour
         BuildSupplyCart();
         BuildCanopyViews();
         BuildTeaRoofView();
+        BuildPavilionRoofViews();
         BuildCookingLife();
         BuildTeaNightScene();
         BuildRiverScenery();
@@ -321,7 +322,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(data.night)foreach(var g in data.guests)if(!g.done){if(g.state>=2)PayGuest(g);else data.lost++;}
         if(data.night){data.reportDay=data.day;}
         TodayLedger().closed=true;
-        storyGuest=-1;brewing=false;ResetCookingLife();ResetAmbientTalking();
+        storyGuest=-1;brewing=false;ResetCookingLife();ResetAmbientTalking();RestorePavilionRoofViews();
         data.day++;data.clock=0;data.night=false;data.harvested.Clear();data.guests.Clear();data.wave=0;duskNotified=false;
         data.onTrail=false;travelBook=false;SyncTrip();
         if(Friendship(2).stage==3)data.bamboo+=2;
@@ -437,6 +438,7 @@ public partial class MountainTeaGame : MonoBehaviour
     {
         ResetAmbientTalking();
         RestoreTeaRoofView();
+        RestorePavilionRoofViews();
         ResetCookingLife();
         ResetTeaNightScene();
         ResetRiverScenery();
@@ -504,7 +506,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.29",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.30",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -764,6 +766,7 @@ public partial class MountainTeaGame : MonoBehaviour
             TestFriendStories();
             TestTeaPlanning();
             TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();TestServiceReadability();TestTeaNightScene();TestRiverScenery();TestTrailRestStops();
+            TestPavilionRoofViews();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -1033,6 +1036,21 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);player.position=TP(85.8f,18.1f);cam.transform.position=player.position+CameraOffset;photoMode=true;Screen.SetResolution(1024,768,FullScreenMode.Windowed);toastTimer=0;
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"117-rest-small-window.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;modal=false;paused=true;settingsOpen=true;toastTimer=0;
+        CloseAudioSettings();paused=false;NewGame();modal=false;ChangeRegion(true);player.position=TP(86,21);cam.transform.position=player.position+CameraOffset;cam.orthographicSize=8;photoMode=true;toastTimer=0;qaOpaquePavilions=true;RestorePavilionRoofViews();
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"118-pavilion-lookout-opaque.png"));
+        yield return new WaitForSeconds(.5f);qaOpaquePavilions=false;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"119-pavilion-lookout-visible.png"));
+        yield return new WaitForSeconds(.5f);player.position=TP(106,20);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"120-pavilion-patrol-visible.png"));
+        yield return new WaitForSeconds(.5f);data.day=3;SyncWeatherPeople();toastTimer=0;
+        yield return new WaitForSeconds(3);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"121-pavilion-patrol-rain.png"));
+        yield return new WaitForSeconds(.5f);player.position=TP(86,21);cam.transform.position=player.position+CameraOffset;photoMode=false;nearest=SelectNearestSpot();toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"122-pavilion-reading-visible.png"));
+        yield return new WaitForSeconds(.5f);photoMode=true;Screen.SetResolution(1024,768,FullScreenMode.Windowed);toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"123-pavilion-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);data.day=1;SyncWeatherPeople();player.position=TP(86,14);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"124-pavilion-roof-restored.png"));
+        yield return new WaitForSeconds(.5f);ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"28-settings-small-window.png"));

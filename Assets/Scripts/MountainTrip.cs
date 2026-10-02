@@ -69,7 +69,7 @@ public partial class MountainTeaGame
         var batch=new List<GameObject>();
         foreach(var renderer in trailRoot.GetComponentsInChildren<MeshRenderer>())
         {
-            if(renderer.GetComponent<TextMesh>()||renderer.GetComponentInParent<AvatarMotion>()||renderer.GetComponent<WaterRibbon>()||renderer.name=="Faceted mountain canopy"||renderer.transform.parent.name=="山栗"||renderer.transform.parent.name=="野莓")continue;
+            if(IsPavilionRoof(renderer.name)||renderer.GetComponent<TextMesh>()||renderer.GetComponentInParent<AvatarMotion>()||renderer.GetComponent<WaterRibbon>()||renderer.name=="Faceted mountain canopy"||renderer.transform.parent.name=="山栗"||renderer.transform.parent.name=="野莓")continue;
             batch.Add(renderer.gameObject);
         }
         StaticBatchingUtility.Combine(batch.ToArray(),trailRoot.gameObject);
@@ -87,7 +87,7 @@ public partial class MountainTeaGame
     bool ChangeRegion(bool mountain)
     {
         if(data.night||data.holding||trial)return false;
-        data.onTrail=mountain;player.position=mountain?TP(82,-12):ValleyGate+Vector3.back;
+        RestorePavilionRoofViews();data.onTrail=mountain;player.position=mountain?TP(82,-12):ValleyGate+Vector3.back;
         cam.transform.position=player.position+CameraOffset;modal=false;nearest=null;travelBook=false;ResetAmbientTalking();
         if(mountain)data.trailVisited=true;SyncTrip();Save(false);Notify(mountain?"瀑布山路 · 山栗與野莓每天更新，便當沒有倒數限制。":"回到河童溪谷，可以備餐與營業了。",6);return true;
     }
@@ -141,6 +141,7 @@ public partial class MountainTeaGame
         TickCanopyViews(Time.deltaTime);
         TickCookingLife(Time.deltaTime);
         TickTeaRoofView(Time.deltaTime);
+        TickPavilionRoofViews(Time.deltaTime);
     }
     string LunchStatus(){return data.lunchState==2?"已打包 → 送到天狗哨所":data.lunchState==1?"已接取 → 茶屋打包菇飯 ×1":data.lunchState==3?"已完成，下一天可再接":"尚未接取";}
     void DrawTravelBook()
