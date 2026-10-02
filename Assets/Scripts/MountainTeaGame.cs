@@ -144,7 +144,7 @@ public partial class MountainTeaGame : MonoBehaviour
             if(settingsOpen){CloseAudioSettings();}
             else if(fishing){fishing=false;Notify("收起釣竿。");}
             else if(brewing){CancelBrew();}
-            else if(modal){if(storyGuest>=0)FinishStory();else {modal=false;speaker="";eventFriend=-1;}}
+            else if(modal){if(ambientDialogue)CloseAmbientChat(false);else if(storyGuest>=0)FinishStory();else {modal=false;speaker="";eventFriend=-1;ResetAmbientTalking();}}
             else if(relationships){relationships=false;notebook=true;}
             else if(planning){Save(false);planning=false;}
             else if(travelBook)travelBook=false;
@@ -221,11 +221,12 @@ public partial class MountainTeaGame : MonoBehaviour
             if(s.kind==0)data.leaves+=3;else if(s.kind==1)data.mushrooms+=2;else data.bamboo+=2;
             Notify(s.name+" ＋"+(s.kind==0?3:2));Play(pickupSound);Save(false);return;
         }
-        modal=true;speaker=s.name;
+        ResetAmbientTalking();rainDialogue=false;festivalDialogue=false;modal=true;speaker=s.name;
         if(s.kind==10)dialogue="山風從門簾穿過，茶香留在屋裡。\n備好料理，客人才會在傍晚登門。";
         if(s.kind==11)dialogue=data.questDone?"水車又轉起來啦！茶屋那邊忙的話，我晚上過去捧場。":data.questAccepted?"修水車還缺 4 份嫩竹筍。不是拿來做機械啦，是給工人吃的！\n交給我，我付你 80 文工錢。":"你好，我是河城荷取。茶屋終於有人接手了？\n我正忙著修水車，能帶 4 份嫩竹筍給我嗎？報酬 80 文。";
         if(s.kind==12)dialogue="文文。新聞是：妖怪之山又有一間茶屋開張！\n我喜歡山風清茶，椛偏愛溪魚鹽燒；荷取來了記得準備竹筍菇飯。\n過橋沿著北邊山路走，就能找到椛。";
         if(s.kind==13)dialogue=data.trialDone?"身手不錯。今晚巡山結束，我會去茶屋。\n溪魚鹽燒配一杯茶，很適合休息。":"我是犬走椛。前面的山路需要巡查。\n來一場 25 秒的符卡練習吧：躲開紅色彈幕就好，撐過去有 50 文獎勵。\n這是練習，失敗隨時能再試。";
+        if(s.kind>=11&&s.kind<=13){OfferAmbientChat(s);SetDialogueMood(s.kind==11?2:s.kind==13?3:1);}
         if(s.kind==14){modal=false;fishing=true;fishTimer=0;Notify("在浮標進入金色區域時按空白鍵。",4);}
         if(s.kind==15)dialogue=data.restored?"新招牌掛上去了。山風茶屋，今天也好好營業吧。":"舊招牌被風雨打壞了。\n花 180 文修繕，讓山風茶屋重新成為山中歇腳的地方。";
         if(s.kind==16)dialogue="收好工具，回房睡一晚。\n進入下一天會補滿山中的採集物，尚未結束的營業會先結算。";
@@ -317,7 +318,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(data.night)foreach(var g in data.guests)if(!g.done){if(g.state>=2)PayGuest(g);else data.lost++;}
         if(data.night){data.reportDay=data.day;}
         TodayLedger().closed=true;
-        storyGuest=-1;brewing=false;ResetCookingLife();
+        storyGuest=-1;brewing=false;ResetCookingLife();ResetAmbientTalking();
         data.day++;data.clock=0;data.night=false;data.harvested.Clear();data.guests.Clear();data.wave=0;duskNotified=false;
         data.onTrail=false;travelBook=false;SyncTrip();
         if(Friendship(2).stage==3)data.bamboo+=2;
@@ -363,7 +364,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(success&&!data.trialDone){RecordLedger(2,50);data.trialDone=true;data.money+=50;Notify("符卡練習通過 · ＋50 文！",6);Play(chime);Save(false);}
         else Notify(success?"再一次漂亮地避開了彈幕！":"練習結束。和椛說話就能再試，沒有懲罰。",5);
     }
-    void Say(string n,string words){rainDialogue=false;festivalDialogue=false;speaker=n;dialogue=words;modal=true;SetDialogueMood(n=="河城荷取"?2:n=="犬走椛"?3:1);}
+    void Say(string n,string words){ResetAmbientTalking();rainDialogue=false;festivalDialogue=false;speaker=n;dialogue=words;modal=true;SetDialogueMood(n=="河城荷取"?2:n=="犬走椛"?3:1);}
     void Notify(string words,float time=3){toast=words;toastTimer=time;}
     void Play(AudioClip c){if(audioSource&&c)audioSource.PlayOneShot(c);}
     public void Save(bool feedback=true)
@@ -430,6 +431,7 @@ public partial class MountainTeaGame : MonoBehaviour
     void OnApplicationPause(bool pause){if(pause)Save(false);}
     void ResetTransient()
     {
+        ResetAmbientTalking();
         RestoreTeaRoofView();
         ResetCookingLife();
         if(visitorRoot)foreach(Transform guest in visitorRoot)Destroy(guest.gameObject);visitors.Clear();ValleyAtmosphere.ClearMeals();
@@ -496,7 +498,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.23",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.24",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -597,8 +599,9 @@ public partial class MountainTeaGame : MonoBehaviour
         Text(367,346,706,40,speaker,heading);Box(new Rect(367,395,706,2),gold);
         bool hasPortrait=portraits.ContainsKey(speaker);
         if(hasPortrait)Portrait(speaker,new Rect(368,418,124,142));
-        if(hasPortrait)TeaTag(new Rect(925,349,150,30),dialogueMood==1?"安心微笑":dialogueMood==2?"好奇傾聽":dialogueMood==3?"認真巡查":"山中日常",sage);
+        if(hasPortrait)TeaTag(new Rect(925,349,150,30),ambientDialogue?FamiliarTopic():storyGuest>=0?FamiliarTopic(true):dialogueMood==1?"安心微笑":dialogueMood==2?"好奇傾聽":dialogueMood==3?"認真巡查":"山中日常",sage);
         Text(hasPortrait?515:367,415,hasPortrait?560:706,170,dialogue,body);
+        if(ambientDialogue){DrawAmbientDialog();return;}
         if(rainDialogue){if(Button(730,633,345,"收好茶杯 [Esc]")){modal=false;speaker="";rainDialogue=false;}return;}
         if(festivalDialogue){if(Button(730,633,345,"記住今天的聚會 [Esc]")){modal=false;speaker="";festivalDialogue=false;}return;}
         if(storyGuest>=0){if(Button(365,633,350,"謝謝消息，結帳送客"))FinishStory();}
@@ -619,9 +622,10 @@ public partial class MountainTeaGame : MonoBehaviour
         else if(speaker=="回房休息"||speaker=="今晚的營業紀錄"){if(Button(365,633,350,"休息，進入下一天"))NextDay();}
         else if(speaker=="開始新旅程"){if(Button(365,633,350,"確認開始新旅程"))NewGame();}
         int friend=FriendIndex(speaker);
+        if(CanAmbientChat()&&Button(365,580,140,"聊聊近況")){OpenAmbientChat();return;}
         if((speaker=="茶屋招牌"||speaker=="今晚的營業紀錄")&&Button(365,580,710,speaker=="茶屋招牌"?"購買庭院布置":"查看詳細營業結算"))OpenPlanning(speaker=="茶屋招牌"?1:2);
         if(friend>=0&&eventFriend<0&&storyGuest<0&&!data.night&&Button(515,580,560,EventReady(friend)?"角色事件 · "+ChapterNames[friend]:EventRequirement(friend),EventReady(friend)))OpenFriendEvent(friend);
-        if(Button(730,633,345,speaker=="山風茶屋 · 第一天"?"帶上工具出發":"關閉 [Esc]")){if(storyGuest>=0)FinishStory();else {modal=false;speaker="";eventFriend=-1;}}
+        if(Button(730,633,345,speaker=="山風茶屋 · 第一天"?"帶上工具出發":"關閉 [Esc]")){if(storyGuest>=0)FinishStory();else {modal=false;speaker="";eventFriend=-1;ResetAmbientTalking();}}
     }
     void DrawFishing()
     {
@@ -753,7 +757,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -936,9 +940,23 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"78-kitchen-small-window.png"));
         yield return new WaitForSeconds(.5f);CancelBrew();Screen.SetResolution(1440,900,FullScreenMode.Windowed);data.day=3;photoMode=true;toastTimer=0;
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"79-kitchen-rain.png"));
-        yield return new WaitForSeconds(.5f);data.day=1;player.position=new Vector3(-12,0,-11);cam.transform.position=player.position+CameraOffset;
+        yield return new WaitForSeconds(.5f);data.day=1;player.position=new Vector3(-6.2f,0,-2.2f);cam.transform.position=player.position+CameraOffset;cam.orthographicSize=11.5f;
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"80-kitchen-roof-restored.png"));
         yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;data.questDone=true;player.position=spots[1].pos+Vector3.back;cam.transform.position=player.position+CameraOffset;Interact(spots[1]);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"81-familiar-choice.png"));
+        yield return new WaitForSeconds(.5f);OpenAmbientChat();
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"82-familiar-nitori-sun.png"));
+        yield return new WaitForSeconds(.5f);CloseAmbientChat(false);data.day=3;SyncWeatherPeople();player.position=spots[2].pos+Vector3.back;cam.transform.position=player.position+CameraOffset;Interact(spots[2]);OpenAmbientChat();
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"83-familiar-aya-rain.png"));
+        yield return new WaitForSeconds(.5f);CloseAmbientChat(false);data.day=2;data.clock=320;SyncWeatherPeople();player.position=spots[3].pos+Vector3.back;cam.transform.position=player.position+CameraOffset;Interact(spots[3]);OpenAmbientChat();
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"84-familiar-momiji-dusk.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"85-familiar-small-window.png"));
+        yield return new WaitForSeconds(.5f);CloseAmbientChat(false);Screen.SetResolution(1440,900,FullScreenMode.Windowed);NewGame();modal=false;data.questDone=true;data.day=3;data.tea=5;player.position=new Vector3(-12,0,-3);cam.transform.position=player.position+CameraOffset;OpenShop();modal=false;
+        yield return new WaitForSeconds(5);int familiarGuest=data.guests.FindIndex(g=>g.name==Friends[1]);PickTray(familiarGuest,0);DeliverTray(true);toastTimer=0;
+        yield return new WaitForSeconds(7);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"86-familiar-rain-dinner.png"));
+        yield return new WaitForSeconds(.5f);FinishStory();
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

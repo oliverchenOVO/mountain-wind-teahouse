@@ -41,8 +41,8 @@ public partial class MountainTeaGame
     string MealConversation(Guest g)
     {
         int i=FriendIndex(g.name);if(i<0)return "謝謝招待，山風今天也很溫柔。";var b=Friendship(i);
-        string greeting=b.affection>=6?"又見面了，今天也想在這裡多坐一會兒。":b.affection>=3?"漸漸習慣來這裡歇腳了。":"謝謝招待，這份餐點很暖心。";
-        return greeting+"\n"+MountainNews(g)+"\n"+(b.stage>=3?"送你的禮物，記得好好使用喔。":"白天有空的話，到山路上找我聊聊吧。");
+        string greeting=b.affection>=6?"又見面了，今晚也想多坐一會兒。":b.affection>=3?"漸漸習慣來這裡歇腳了。":"謝謝招待，這份餐點很暖心。";
+        return greeting+"\n"+FamiliarRemark(i,true)+"\n"+MountainNews(g)+"\n"+(b.stage>=3?"今晚可以慢慢歇一會兒。":"白天有空，再到山路聊聊吧。");
     }
     bool EventReady(int i)
     {

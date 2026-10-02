@@ -21,8 +21,8 @@ public static class BuildDemo
         PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);
         PlayerSettings.apiCompatibilityLevel=ApiCompatibilityLevel.NET_Standard;
         QualitySettings.SetQualityLevel(3);QualitySettings.vSyncCount=1;QualitySettings.antiAliasing=4;
-        Directory.CreateDirectory("Builds/WindowsV23");
-        var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{"Assets/Scenes/MountainTea.unity"},locationPathName="Builds/WindowsV23/MountainTea.exe",target=BuildTarget.StandaloneWindows64,options=BuildOptions.None});
+        Directory.CreateDirectory("Builds/WindowsV24");
+        var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{"Assets/Scenes/MountainTea.unity"},locationPathName="Builds/WindowsV24/MountainTea.exe",target=BuildTarget.StandaloneWindows64,options=BuildOptions.None});
         Debug.Log("DEMO BUILD: "+report.summary.result+" | "+report.summary.totalSize+" bytes");
         if(report.summary.result!=BuildResult.Succeeded)throw new System.Exception("Demo build failed");
     }

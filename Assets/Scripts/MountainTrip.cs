@@ -88,7 +88,7 @@ public partial class MountainTeaGame
     {
         if(data.night||data.holding||trial)return false;
         data.onTrail=mountain;player.position=mountain?TP(82,-12):ValleyGate+Vector3.back;
-        cam.transform.position=player.position+CameraOffset;modal=false;nearest=null;travelBook=false;
+        cam.transform.position=player.position+CameraOffset;modal=false;nearest=null;travelBook=false;ResetAmbientTalking();
         if(mountain)data.trailVisited=true;SyncTrip();Save(false);Notify(mountain?"瀑布山路 · 山栗與野莓每天更新，便當沒有倒數限制。":"回到河童溪谷，可以備餐與營業了。",6);return true;
     }
     bool AcceptLunch()
@@ -125,9 +125,9 @@ public partial class MountainTeaGame
             if(data.harvested.Contains(s.id))return;NormalizeWeek();data.weekHarvest++;data.harvested.Add(s.id);s.visual.SetActive(false);
             if(s.kind==23)data.chestnuts+=2;else data.berries+=2;Notify(s.name+" ＋2");Save(false);return;
         }
-        if(s.kind==22){if(!DeliverLunch())Say("犬走椛",data.lunchState==1?"到茶屋料理台打包一份竹筍菇飯，再送到這個哨所吧。":"山路今天很平靜。打開旅行手帳，可以接下巡山便當委託。\n沒有時間限制，路上慢慢逛就好。");}
-        if(s.kind==26){data.photoVisited=true;Say("射命丸文","瀑布在這個角度最好看！\n今天不追大新聞，拍一張山中日常就夠了。\n穿過小橋後，沿著山栗小徑就能到椛的哨所。 ");Save(false);}
-        if(s.kind==27){data.waterVisited=true;Say("河城荷取","這條水路通向溪谷的水車。橋面濕，小心走。\n山栗與野莓就在前面，但別走進水裡喔。");Save(false);}
+        if(s.kind==22){if(!DeliverLunch()){Say("犬走椛",data.lunchState==1?"到茶屋料理台打包一份竹筍菇飯，再送到這個哨所吧。":"山路今天很平靜。打開旅行手帳，可以接下巡山便當委託。\n沒有時間限制，路上慢慢逛就好。");OfferAmbientChat(s);}}
+        if(s.kind==26){data.photoVisited=true;Say("射命丸文","瀑布在這個角度最好看！\n今天不追大新聞，拍一張山中日常就夠了。\n穿過小橋後，沿著山栗小徑就能到椛的哨所。 ");OfferAmbientChat(s);Save(false);}
+        if(s.kind==27){data.waterVisited=true;Say("河城荷取","這條水路通向溪谷的水車。橋面濕，小心走。\n山栗與野莓就在前面，但別走進水裡喔。");OfferAmbientChat(s);Save(false);}
         if(s.kind==25){data.lookoutVisited=true;Say("瀑布觀景台","水聲從山壁落下，遠方的溪谷隱約可見。\n你把這個歇腳處記進旅行手帳。 ");Save(false);}
     }
     void LateUpdate()
