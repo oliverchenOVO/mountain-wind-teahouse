@@ -85,7 +85,7 @@ public static class MountainArt
                 if(Random.value>.65f) Reed(Ground(x+side*.28f,z),.7f);
             }
         }
-        Bridge(-4);Bridge(12);
+        Bridge(-4);Bridge(12);RiverBankDetails();
         // Animated ribbons spill between the rock walls, with spray at their foot.
         for(int i=0;i<5;i++)
         {
@@ -333,12 +333,41 @@ public static class MountainArt
             Beam("Grass blade",p,end,.017f,new Color(.48f,.57f,.28f));
         }
     }
+    static void RiverBankDetails()
+    {
+        // Small wet shelves stop below the walking bank; no new colliders or crossings.
+        for(int side=-1;side<=1;side+=2)
+        {
+            var vertices=new List<Vector3>();var triangles=new List<int>();
+            for(int z=-20;z<19;z++)
+            {
+                if(Mathf.Abs(z+4)<2||Mathf.Abs(z-12)<2||side<0&&Mathf.Abs(z+11)<2)continue;
+                float edge=8+side*2.02f,outer=edge+side*(.23f+Mathf.Sin(z*.83f)*.065f);int a=vertices.Count;
+                vertices.Add(new Vector3(edge,-.095f,z));vertices.Add(new Vector3(outer,-.04f,z));vertices.Add(new Vector3(outer+Mathf.Sin(z)*.03f,-.04f,z+1));vertices.Add(new Vector3(edge,-.095f,z+1));
+                if(side>0)triangles.AddRange(new[]{a,a+2,a+1,a,a+3,a+2});else triangles.AddRange(new[]{a,a+1,a+2,a,a+2,a+3});
+            }
+            var mesh=new Mesh{name="Irregular wet river bank"};mesh.SetVertices(vertices);mesh.SetTriangles(triangles,0);mesh.RecalculateNormals();MeshObject("Wet river bank shelf",mesh,TeaHouseWorld.Mat("Wet river silt",new Color(.35f,.40f,.30f)));
+            for(int i=0;i<13;i++)
+            {
+                float z=-18+i*2.8f;if(Mathf.Abs(z+4)<2||Mathf.Abs(z-12)<2||side<0&&Mathf.Abs(z+11)<2)continue;
+                Vector3 p=new Vector3(8+side*2.05f,-.03f,z);
+                Facet("Low wet river pebble",p,new Vector3(.28f,.11f,.32f),new Color(.37f,.43f,.38f),6);
+                Facet("River pebble moss",p+new Vector3(side*.07f,.08f,.025f),new Vector3(.20f,.026f,.22f),new Color(.40f,.52f,.30f),6);
+                if(i%3==0)Reed(p+new Vector3(side*.31f,.05f,.24f),.42f);
+            }
+        }
+    }
     static void Bridge(float z)
     {
-        for(int i=0;i<16;i++)S("Bridge weathered plank",PrimitiveType.Cube,new Vector3(5.5f+i*.33f,.13f,z),new Vector3(.30f,.22f,2.45f),i%3==0?new Color(.54f,.37f,.22f):cedar);
+        for(int i=0;i<16;i++)
+        {
+            S("Bridge weathered plank",PrimitiveType.Cube,new Vector3(5.5f+i*.33f,.13f,z),new Vector3(.30f,.22f,2.45f),i%3==0?new Color(.54f,.37f,.22f):cedar);
+            for(int side=-1;side<=1;side+=2)S("Bridge iron nail",PrimitiveType.Cylinder,new Vector3(5.5f+i*.33f,.247f,z+side*.83f),new Vector3(.043f,.007f,.043f),new Color(.28f,.28f,.23f));
+        }
         for(int side=-1;side<=1;side+=2)
         {
             for(int x=6;x<=10;x+=2)S("Bridge post",PrimitiveType.Cube,new Vector3(x,.48f,z+side*1.17f),new Vector3(.13f,.96f,.13f),timber);
+            for(int x=6;x<=10;x+=2)for(int wrap=0;wrap<3;wrap++)S("Bridge hemp joint",PrimitiveType.Cylinder,new Vector3(x,.86f+wrap*.035f,z+side*1.17f),new Vector3(.20f,.009f,.20f),new Color(.66f,.56f,.36f));
             S("Bridge top rail",PrimitiveType.Cube,new Vector3(8,.94f,z+side*1.17f),new Vector3(5.3f,.11f,.11f),cedar);
             S("Bridge lower rail",PrimitiveType.Cube,new Vector3(8,.52f,z+side*1.17f),new Vector3(5.3f,.07f,.07f),cedar);
         }

@@ -134,6 +134,7 @@ public partial class MountainTeaGame
     {
         TickRainWeather(Time.deltaTime);
         TickTeaNightScene(Time.deltaTime);
+        TickRiverScenery(Time.deltaTime);
         SyncSupplyCart();
         TickTeaLife(Time.deltaTime);
         TickLivingMountain(Time.deltaTime);UpdateMountainAudio(Time.deltaTime);UpdateInteractionMarker();
