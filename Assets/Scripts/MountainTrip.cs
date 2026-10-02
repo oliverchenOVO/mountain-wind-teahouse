@@ -110,7 +110,7 @@ public partial class MountainTeaGame
     bool DeliverLunch()
     {
         if(!data.onTrail||data.night||data.lunchState!=2||Vector3.Distance(player.position,spots.Find(s=>s.kind==22).pos)>2.6f)return false;
-        data.lunchState=3;data.lunchDay=data.day;data.deliveries++;data.money+=100;data.trailRecipes=true;
+        RecordLedger(2,100);data.lunchState=3;data.lunchDay=data.day;data.deliveries++;data.money+=100;data.trailRecipes=true;
         data.chestnuts+=2;data.berries+=2;SyncTrip();
         data.journal.Add("第 "+data.day+" 天 · 巡山便當送達，椛分享了栗子飯與莓果茶食譜。");
         Say("犬走椛","熱便當送到啦，辛苦你走這趟山路。\n這是 100 文報酬，還有山栗與野莓各兩份。\n把栗子飯和莓果茶的做法帶回茶屋吧！");Play(chime);Save(false);return true;

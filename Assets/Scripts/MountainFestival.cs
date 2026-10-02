@@ -49,7 +49,7 @@ public partial class MountainTeaGame
         if(!CanShareFestival(friend))return false;
         bool premium=Quality(friend)>=Stock(friend);ChangeStock(friend,-1);if(premium)ChangeQuality(friend,-1);
         data.festivalShared[friend]=true;bool finished=FestivalCount()==3&&!data.festivalRewardClaimed;
-        if(finished){data.festivalRewardClaimed=true;data.money+=60;}
+        if(finished){RecordLedger(2,60);data.festivalRewardClaimed=true;data.money+=60;}
         string[] lines={"今天不追新聞，先替這杯茶留個位置。\n山風把燈籠吹得輕輕搖晃，這就是今天的頭條。\n下一次小祭典，也讓我坐在這裡吧。", "這碗菇飯，讓我想起剛修好水車的那一天。\n機器偶爾也該停一下，人也是。\n能和大家一起吃飯，比再多做一個零件還開心。", "巡山的路我已經確認過了，今天可以慢慢吃。\n山裡的小聚會不需要很熱鬧。\n有一盞燈、有熟悉的人，就足夠了。"};
         data.journal.Add("第 "+data.day+" 天 · 山中小祭典 · 與"+FestivalFriends[friend]+"分享"+DishNames[friend]);
         if(finished)data.journal.Add("山中小祭典完成 · 三友紀念牌與謝禮 60 文");

@@ -10,7 +10,7 @@ public partial class MountainTeaGame
     bool BuyUpgrade(int i)
     {
         if(i<0||i>=2||!CanImprove()||UpgradeOwned(i)||data.money<UpgradeCosts[i])return false;
-        data.money-=UpgradeCosts[i];if(i==0)data.comfortUpgrade=true;else data.prepUpgrade=true;
+        RecordLedger(3,UpgradeCosts[i]);data.money-=UpgradeCosts[i];if(i==0)data.comfortUpgrade=true;else data.prepUpgrade=true;
         SyncUpgradeArt();data.journal.Add("第 "+data.day+" 天 · 茶屋升級："+UpgradeNames[i]);Notify(UpgradeNames[i]+"已啟用 · 永久有效",5);Play(chime);Save(false);return true;
     }
     int BatchCount(int dish)

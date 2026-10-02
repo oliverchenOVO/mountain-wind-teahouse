@@ -73,7 +73,7 @@ public partial class MountainTeaGame
     {
         if(!CanServeRainTea())return false;int chapter=data.rainStoryStage,dish=data.leafTea>0?4:0;
         bool premium=Quality(dish)>=Stock(dish);ChangeStock(dish,-1);if(premium)ChangeQuality(dish,-1);
-        data.rainStoryStage++;data.money+=20;
+        RecordLedger(2,20);data.rainStoryStage++;data.money+=20;
         string[] speakers={"河城荷取","射命丸文","犬走椛"};
         string[] lines={"雨一來，工坊的零件就得收好。\n你的屋簷剛好讓我停下來喘口氣。\n暖茶真舒服。等雨停了，再回去修水車吧。", "今天的新聞，是這間茶屋沒有趕走避雨的人。\n鏡頭沾了水，就先不拍了。\n有些山中日常，只用眼睛記住也很好。", "巡山時我會記下每一個能避雨的地方。\n現在，這間茶屋也在那份名單上。\n雨會停，燈還亮著。謝謝你的茶。"};
         data.journal.Add("第 "+data.day+" 天 · 避雨茶 "+(chapter+1)+"/3 · "+speakers[chapter]);

@@ -29,7 +29,7 @@ public partial class MountainTeaGame
     bool BuySupply(int i,int count)
     {
         if(!CanBuySupply(i,count))return false;
-        int cost=SupplyPrices[i]*count;data.money-=cost;data.supplyBought[i]+=count;data.supplySpent+=cost;
+        int cost=SupplyPrices[i]*count;RecordLedger(1,cost);data.money-=cost;data.supplyBought[i]+=count;data.supplySpent+=cost;
         if(i==0)data.leaves+=count;else if(i==1)data.mushrooms+=count;else if(i==2)data.bamboo+=count;else if(i==3)data.fish+=count;else if(i==4)data.chestnuts+=count;else data.berries+=count;
         data.journal.Add("第 "+data.day+" 天 · 雜貨補給："+SupplyNames[i]+" ×"+count+" · 支出 "+cost+" 文");
         Notify("購入 "+SupplyNames[i]+" ×"+count+" · −"+cost+" 文",4);Play(pickupSound);Save(false);return true;

@@ -99,7 +99,7 @@ public partial class MountainTeaGame
     bool ReturnNotebook()
     {
         if(data.notebookStage!=4||!data.onTrail||data.night||Vector3.Distance(player.position,spots.Find(s=>s.kind==22).pos)>2.6f)return false;
-        data.notebookStage=5;data.money+=60;data.leaves+=3;data.journal.Add("第 "+data.day+" 天 · 找回椛的巡山筆記，約好回茶屋喝茶。");
+        RecordLedger(2,60);data.notebookStage=5;data.money+=60;data.leaves+=3;data.journal.Add("第 "+data.day+" 天 · 找回椛的巡山筆記，約好回茶屋喝茶。");
         Say("犬走椛","你找回了我的巡山筆記！\n除了路線，裡面還記著山裡適合歇腳的地方。\n收下 60 文和三份茶葉吧。回茶屋後，泡杯茶再讀最後一頁。");Play(chime);Save(false);return true;
     }
     bool NotebookEpilogue()

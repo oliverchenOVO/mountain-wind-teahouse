@@ -35,7 +35,7 @@ public partial class MountainTeaGame
     bool ClaimWeek(int page)
     {
         NormalizeWeek();if(page<0||page>=7||page>WeekPage()||data.weekClaimed[page]||!WeekGoal(page,0)||!WeekGoal(page,1))return false;
-        data.weekClaimed[page]=true;data.money+=30;
+        RecordLedger(2,30);data.weekClaimed[page]=true;data.money+=30;
         data.journal.Add("第 "+data.day+" 天 · 七日手帖："+WeekTitles[page]+" · 謝禮 30 文");
         Notify("手帖留下一枚茶印 · ＋30 文",5);Play(chime);Save(false);return true;
     }

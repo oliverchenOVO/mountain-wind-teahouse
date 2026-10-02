@@ -25,6 +25,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public bool guideHidden;
         public bool[] festivalShared;public bool festivalRewardClaimed;
         public int supplyDay,supplySpent;public int[] supplyBought;
+        public bool ledgerStarted;public List<LedgerDay> ledger;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -251,7 +252,7 @@ public partial class MountainTeaGame : MonoBehaviour
     public bool CompleteQuest()
     {
         if(!data.questAccepted||data.questDone||data.bamboo<4)return false;
-        data.bamboo-=4;data.money+=80;data.questDone=true;Play(chime);Notify("荷取的委託完成 · ＋80 文");Save(false);return true;
+        RecordLedger(2,80);data.bamboo-=4;data.money+=80;data.questDone=true;Play(chime);Notify("荷取的委託完成 · ＋80 文");Save(false);return true;
     }
     void CatchFish()
     {
@@ -309,7 +310,7 @@ public partial class MountainTeaGame : MonoBehaviour
     public bool Restore()
     {
         if(data.restored||data.money<180)return false;
-        data.money-=180;data.restored=true;UpdateSign();modal=false;result=true;Play(chime);Save(false);return true;
+        RecordLedger(3,180);data.money-=180;data.restored=true;UpdateSign();modal=false;result=true;Play(chime);Save(false);return true;
     }
     void UpdateSign()
     {
@@ -320,6 +321,7 @@ public partial class MountainTeaGame : MonoBehaviour
         ReturnTray();
         if(data.night)foreach(var g in data.guests)if(!g.done){if(g.state>=2)PayGuest(g);else data.lost++;}
         if(data.night){data.reportDay=data.day;}
+        TodayLedger().closed=true;
         storyGuest=-1;brewing=false;
         data.day++;data.clock=0;data.night=false;data.harvested.Clear();data.guests.Clear();data.wave=0;duskNotified=false;
         data.onTrail=false;travelBook=false;SyncTrip();
@@ -363,7 +365,7 @@ public partial class MountainTeaGame : MonoBehaviour
     void EndTrial(bool success)
     {
         trial=false;foreach(var b in bullets)Destroy(b.visual);bullets.Clear();visual.gameObject.SetActive(true);player.position=beforeTrial;
-        if(success&&!data.trialDone){data.trialDone=true;data.money+=50;Notify("符卡練習通過 · ＋50 文！",6);Play(chime);Save(false);}
+        if(success&&!data.trialDone){RecordLedger(2,50);data.trialDone=true;data.money+=50;Notify("符卡練習通過 · ＋50 文！",6);Play(chime);Save(false);}
         else Notify(success?"再一次漂亮地避開了彈幕！":"練習結束。和椛說話就能再試，沒有懲罰。",5);
     }
     void Say(string n,string words){rainDialogue=false;festivalDialogue=false;speaker=n;dialogue=words;modal=true;SetDialogueMood(n=="河城荷取"?2:n=="犬走椛"?3:1);}
@@ -376,6 +378,7 @@ public partial class MountainTeaGame : MonoBehaviour
         NormalizeSpecial();
         NormalizeFestival();
         NormalizeSupplies();
+        NormalizeLedger();
         data.serviceRevision=3;
         data.x=player.position.x;data.z=player.position.z;
         if(trial){data.x=beforeTrial.x;data.z=beforeTrial.z;}
@@ -402,6 +405,7 @@ public partial class MountainTeaGame : MonoBehaviour
             NormalizeSpecial();
             NormalizeFestival();
             NormalizeSupplies();
+            NormalizeLedger();
             if(!Walkable(new Vector3(data.x,0,data.z))){data.onTrail=false;data.x=-6;data.z=-7;}
             player.position=new Vector3(data.x,GroundHeight(data.x,data.z),data.z);SyncTrip();
             foreach(var s in spots)if(s.kind<3)s.visual.SetActive(!data.harvested.Contains(s.id));
@@ -414,6 +418,7 @@ public partial class MountainTeaGame : MonoBehaviour
     {
         ResetTransient();
         data=new SaveData();started=true;paused=false;modal=false;result=false;notebook=false;
+        StartLedger(false);ledgerOffset=0;
         foreach(var s in spots)if(s.kind<3)s.visual.SetActive(true);foreach(var g in visitors)Destroy(g);visitors.Clear();
         player.position=new Vector3(-6,0,-7);Save(false);
         ShowVisitors();UpdateSign();UpdateFriendDecor();UpdateGarden();
@@ -750,7 +755,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -876,6 +881,16 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);modal=false;ShareFestival(1);modal=false;ShareFestival(2);modal=false;photoMode=true;toastTimer=0;cam.orthographicSize=9;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"49-festival-teahouse.png"));
         yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;player.position=new Vector3(-12,0,-3);data.money=500;BuySupply(0,3);BuySupply(1,1);data.questAccepted=true;data.bamboo=4;CompleteQuest();BuyUpgrade(1);data.tea=3;OpenShop();TickCafe(0,true);Serve(0,0);PayGuest(data.guests[0]);OpenPlanning(7);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"54-ledger-today.png"));
+        yield return new WaitForSeconds(.5f);NextDay();modal=false;OpenPlanning(7);ledgerOffset=1;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"55-ledger-history.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"56-ledger-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);Load(Path.Combine(qaDir,"legacy-player-save.json"));OpenPlanning(7);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"57-ledger-legacy-partial.png"));
+        yield return new WaitForSeconds(.5f);planning=false;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
