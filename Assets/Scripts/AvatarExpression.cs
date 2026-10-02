@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class AvatarExpression : MonoBehaviour
 {
     public bool Speaking;public int Mood;
+    public bool Contented;public float MealNod;
     public int EyeCount {get{return eyes.Count;}}
     public bool Smiling {get{return smile&&smile.enabled;}}
     public float HeadTilt {get{return head?Mathf.DeltaAngle(0,head.localEulerAngles.z):0;}}
@@ -40,8 +41,9 @@ public class AvatarExpression : MonoBehaviour
         if(!frozen||Speaking)phase+=dt;
         float cycle=Mathf.Repeat(phase,4.8f),blink=cycle<.14f?Mathf.Lerp(.12f,1,Mathf.Abs(cycle-.07f)/.07f):1;
         foreach(var eye in eyes)eye.localScale=new Vector3(1,blink*(Mood==3?.88f:1),1);
-        head.localRotation=Quaternion.Euler(Speaking?Mathf.Sin(phase*1.8f)*2.4f:0,0,Mood==2?-5f:Mood==1?Mathf.Sin(phase)*1.5f:0);
-        if(smile)smile.enabled=Mood==1;if(originalMouth)originalMouth.SetActive(Mood!=1);
+        bool warm=Mood==1||Mood==0&&Contented;
+        head.localRotation=Quaternion.Euler((Speaking?Mathf.Sin(phase*1.8f)*2.4f:0)+MealNod,0,Mood==2?-5f:warm?Mathf.Sin(phase)*1.5f:0);
+        if(smile)smile.enabled=warm;if(originalMouth)originalMouth.SetActive(!warm);
     }
     void Update(){TickFace(Time.unscaledDeltaTime,AvatarMotion.Frozen);}
 }

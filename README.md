@@ -1,10 +1,19 @@
-# 山風茶屋 — Windows 可玩 Demo 0.15
+# 山風茶屋 — Windows 可玩 Demo 0.16
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV15/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV15 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV16/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV16 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.16 角色生活動作
+
+- 清茶、竹葉暖茶與野莓暖茶使用拿杯／抬杯喝茶循環；菇飯、鹽燒、香菇湯與山栗飯使用拿碗與餐具的簡易用餐循環，不再所有料理都拿茶杯。
+- 收到餐點時輕輕點頭，享用時有安心微笑。表情、動作與食物道具只影響外觀，不增加好感、小費或收益。
+- 對話、手帳與暫停會固定用餐時計、手臂及道具姿勢；恢復後繼續循環。原有說話肖像仍可保留輕微表情，玩家端盤、角色入座與離席流程保留。
+- 讀取已送餐的客人會依原存檔 dish/state 還原喝茶或用餐，不重播接餐反應，也不再次扣料理或付款。動作循環從頭開始，動畫時計不另存。
+- 結束用餐時隱藏拿杯、碗與餐具，還原日常表情。沿用分離網格的程式關節動畫，仍不是完整蒙皮骨架、手部 IK 或真實嘴部進食模擬。
+- 不新增進度欄位或互動點，不變更食譜、價格、候餐規則與 version=1 存檔。
 
 ## 0.15 茶屋升級可視化
 
@@ -79,7 +88,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV15/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV16/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
@@ -212,6 +221,7 @@ Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Win
 - `Assets/Scripts/TeaUpgrades.cs`：0.13 一次性便利升級、候餐速度、批次備餐與兼容測試。
 - `Assets/Scripts/ContextGuide.cs`：0.14 情境優先序、食材與桌位方位、收起偏好與兼容測試。
 - `Assets/Scripts/UpgradeArt.cs`：0.15 六張厚坐墊、備餐工作區、外觀配色與購買存讀同步。
+- `Assets/Scripts/LifeActions.cs`：0.16 生活動作、料理道具分類、暫停與存讀的測試。
 - `Assets/Scripts/AvatarExpression.cs`：0.10 分離網格眨眼、微笑與頭部小動作。
 - `Assets/Scripts/TeaHouseWorld.cs`：程序生成的溪谷、茶屋、森林、橋梁和場景材質。
 - `Assets/Scripts/MountainArt.cs`：0.2 的地形、茶屋、森林與環境細節。

@@ -289,7 +289,7 @@ public partial class MountainTeaGame : MonoBehaviour
             g.transform.SetParent(visitorRoot,true);
             g.transform.rotation=Quaternion.Euler(0,180,0);var motion=g.GetComponent<AvatarMotion>();
             if(animateArrival)motion.Arrive(seat);else motion.Seated=true;
-            motion.Dining=data.guests[i].state==2||data.guests[i].state==3;
+            if(data.guests[i].state==2||data.guests[i].state==3)motion.SetMeal(data.guests[i].dish,false);
             if(data.guests[i].state==4)motion.DepartAfterMeal(0,new Vector3(-5,0,-4));visitors[i]=g;
         }
     }
@@ -485,7 +485,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.15",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.16",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -739,7 +739,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -842,6 +842,12 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);BuyGarden(0,1,true);toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"44-bamboo-upgrade-palette.png"));
         yield return new WaitForSeconds(.5f);photoMode=false;cam.orthographicSize=11.5f;
+        yield return new WaitForSeconds(.5f);NewGame();modal=false;data.tea=6;data.meal=3;data.grilled=3;player.position=new Vector3(-12,0,-5);OpenShop();
+        yield return new WaitForSeconds(4);Serve(0,0);Serve(1,1);Serve(2,2);player.position=new Vector3(-12,0,-6);cam.transform.position=new Vector3(-13,0,-8)+CameraOffset;cam.orthographicSize=6;photoMode=true;toastTimer=0;
+        yield return new WaitForSeconds(1.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"45-tea-and-meal-actions.png"));
+        yield return new WaitForSeconds(.5f);paused=true;photoMode=false;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"46-paused-life-actions.png"));
+        yield return new WaitForSeconds(.5f);paused=false;photoMode=false;cam.orthographicSize=11.5f;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

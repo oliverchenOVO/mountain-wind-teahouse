@@ -49,7 +49,7 @@ public partial class MountainTeaGame
         g.dailyBonus=DishBonus(g.dish);
         g.reward=Prices[g.dish]+(g.order==g.dish?15:0)+(data.heldPerfect?10:0)+(g.dish==0&&Friendship(0).stage==3?5:0)+g.dailyBonus;
         data.holding=false;playerMotion.Carrying=false;playerMotion.Gesture=1;
-        if(index<visitors.Count&&visitors[index])visitors[index].GetComponent<AvatarMotion>().Dining=true;
+        if(index<visitors.Count&&visitors[index])visitors[index].GetComponent<AvatarMotion>().SetMeal(g.dish,true);
         ValleyAtmosphere.Meal(index,g.dish);Notify(g.name+"："+(g.order==g.dish?"正是我想吃的！":"謝謝，這個也很好吃。"));Save(false);return true;
     }
     void ReturnTray()
