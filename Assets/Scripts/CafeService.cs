@@ -46,7 +46,8 @@ public partial class MountainTeaGame
         if(!test&&Vector3.Distance(player.position,seat)>2.6f){Notify("走到客人的桌邊，再按 E 送餐。");return false;}
         var g=data.guests[index];g.state=2;g.stageTime=0;g.dish=data.heldDish;
         g.perfect=data.heldPerfect;
-        g.reward=Prices[g.dish]+(g.order==g.dish?15:0)+(data.heldPerfect?10:0)+(g.dish==0&&Friendship(0).stage==3?5:0);
+        g.dailyBonus=DishBonus(g.dish);
+        g.reward=Prices[g.dish]+(g.order==g.dish?15:0)+(data.heldPerfect?10:0)+(g.dish==0&&Friendship(0).stage==3?5:0)+g.dailyBonus;
         data.holding=false;playerMotion.Carrying=false;playerMotion.Gesture=1;
         if(index<visitors.Count&&visitors[index])visitors[index].GetComponent<AvatarMotion>().Dining=true;
         ValleyAtmosphere.Meal(index,g.dish);Notify(g.name+"："+(g.order==g.dish?"正是我想吃的！":"謝謝，這個也很好吃。"));Save(false);return true;
@@ -60,7 +61,7 @@ public partial class MountainTeaGame
     void PayGuest(Guest g)
     {
         if(g.paid)return;NormalizeWeek();data.weekServed++;g.paid=true;data.money+=g.reward;data.served++;
-        if(data.night){NormalizePlanning();data.nightIncome+=g.reward;data.nightTips+=Mathf.Max(0,g.reward-Prices[g.dish]);data.sales[g.dish]++;}
+        if(data.night){NormalizePlanning();data.nightIncome+=g.reward;data.nightTips+=Mathf.Max(0,g.reward-Prices[g.dish]);data.nightSpecialIncome+=g.dailyBonus;data.sales[g.dish]++;}
         string news=g.name+"："+MountainNews(g);AddFriendship(g);
         string record="第 "+data.day+" 天 · "+news;
         if(!data.journal.Contains(record))data.journal.Add(record);

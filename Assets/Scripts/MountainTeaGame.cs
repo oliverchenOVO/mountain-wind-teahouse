@@ -20,6 +20,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public int notebookStage,routineDay;public List<RoutineState> routines;
         public int rainStoryStage;
         public int weekStartDay,weekHarvest,weekCraft,weekServed;public bool[] weekClaimed;
+        public int specialDay,specialDish,nightSpecialIncome;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -31,6 +32,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public string name; public int order; public float patience=100; public bool done;
         public int state, dish, reward; public float stageTime; public bool paid;
         public bool perfect;
+        public int dailyBonus;
         public Guest(string n,int o) {name=n;order=o;}
     }
     class Spot { public string name; public Vector3 pos; public int kind,id; public GameObject visual; }
@@ -256,7 +258,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(data.night||data.onTrail||data.lunchState==2){Notify("先回到茶屋，或把便當拆開，再開始營業。");return false;}
         if(MenuStock()<3){Notify("今晚菜單上的料理至少要準備 3 份。",5);return false;}
         data.night=true;data.clock=360;data.served=0;data.lost=0;data.wave=0;modal=false;
-        data.nightIncome=0;data.nightTips=0;data.sales=new int[DishNames.Length];data.reportDay=data.day;
+        NormalizeSpecial();data.nightIncome=0;data.nightTips=0;data.nightSpecialIncome=0;data.sales=new int[DishNames.Length];data.reportDay=data.day;
         NewWave();Notify("門簾亮起。今晚的客人到了！",5);Save(false);return true;
     }
     void NewWave()
@@ -364,6 +366,7 @@ public partial class MountainTeaGame : MonoBehaviour
     {
         if(!started)return;
         NormalizeWeek();
+        NormalizeSpecial();
         data.serviceRevision=3;
         data.x=player.position.x;data.z=player.position.z;
         if(trial){data.x=beforeTrial.x;data.z=beforeTrial.z;}
@@ -387,6 +390,7 @@ public partial class MountainTeaGame : MonoBehaviour
             MigrateCafe();
             NormalizePlanning();
             NormalizeWeek();
+            NormalizeSpecial();
             if(!Walkable(new Vector3(data.x,0,data.z))){data.onTrail=false;data.x=-6;data.z=-7;}
             player.position=new Vector3(data.x,GroundHeight(data.x,data.z),data.z);SyncTrip();
             foreach(var s in spots)if(s.kind<3)s.visual.SetActive(!data.harvested.Contains(s.id));
@@ -478,7 +482,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.11",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.12",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -525,6 +529,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(Button(1200,150,215,"茶屋計畫"))OpenPlanning();
         if(Button(25,290,285,"旅行手帳 · 山中委託")){travelBook=true;notebook=false;}
         if(Button(25,625,285,"七日手帖 · "+WeekStamps()+" / 7 茶印"))OpenPlanning(3);
+        if(Button(25,681,285,"推薦備餐 · "+ShortDishes[DailyDish()]+" ＋6"))OpenPlanning();
         if(data.onTrail)Text(35,345,300,95,"瀑布山路\n"+LunchStatus()+"\n山栗 "+data.chestnuts+" · 野莓 "+data.berries,small);
         if(data.notebookStage>0&&data.notebookStage<6){Panel(new Rect(25,455,330,135));Text(42,468,298,30,"巡山筆記 · 下一步",heading);Text(42,511,298,72,NotebookHint(),small);}
         Panel(new Rect(25,125,285,155));Text(45,141,250,36,data.onTrail?"山路小旅行":data.restored?"山中友人的日常":"今天的小目標",heading);
@@ -713,7 +718,7 @@ public partial class MountainTeaGame : MonoBehaviour
             Assert(data.money==cashBefore,"payment waits until meal and conversation");
             Assert(!Serve(0,0),"no duplicate service");
             TestFinishWave();Assert(data.wave==1,"second wave");TickCafe(0,true);
-            Assert(data.money==cashBefore+184&&data.journal.Count==3,"preferred dishes premium tip and journal");
+            Assert(data.money==cashBefore+190&&data.journal.Count==3,"preferred dishes premium tip daily recommendation and journal");
             Assert(Serve(0,0)&&Serve(1,1)&&Serve(2,0),"second wave service");TestFinishWave();modal=false;
             Assert(data.served==6&&data.guests.Count==0,"night settlement");
             Assert(Restore()&&data.restored,"demo completion");Assert(!Restore(),"no duplicate restoration");result=false;
@@ -732,7 +737,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -803,6 +808,13 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);modal=false;data.weekStartDay=1;data.day=7;data.weekHarvest=3;data.weekCraft=5;data.weekServed=9;data.questDone=true;data.deliveries=1;data.lookoutVisited=true;data.notebookStage=6;data.restored=true;data.rainStoryStage=3;Friendship(0).stage=1;NormalizePlanning();data.gardenOwned[0]=2;ClaimWeek(0);ClaimWeek(1);OpenPlanning(3);toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"31-seven-day-journal.png"));
         yield return new WaitForSeconds(.5f);planning=false;
+        yield return new WaitForSeconds(.5f);data.day=3;data.specialDay=0;NormalizeSpecial();OpenPlanning();toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"32-daily-recommendation.png"));
+        yield return new WaitForSeconds(.5f);planning=false;data.day=1;data.specialDay=0;data.onTrail=false;data.tea=4;data.qualityTea=1;data.meal=3;data.grilled=2;SetMenu(0,true);SetMenu(1,true);SetMenu(2,true);OpenShop();guestTarget=0;toastTimer=0;
+        yield return new WaitForSeconds(4);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"33-guest-taste-hints.png"));
+        yield return new WaitForSeconds(.5f);Serve(0,0);PayGuest(data.guests[0]);OpenPlanning(2);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"34-special-report.png"));
+        yield return new WaitForSeconds(.5f);planning=false;data.guests.Clear();data.night=false;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

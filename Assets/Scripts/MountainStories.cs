@@ -163,7 +163,7 @@ public partial class MountainTeaGame
         }
         Assert(Friendship(0).stage==3&&Friendship(1).stage==3&&Friendship(2).stage==3,"three complete multi-day character stories");
         data.tea=1;data.qualityTea=0;data.guests.Clear();data.guests.Add(new Guest(Friends[0],0){state=1});
-        Assert(Serve(0,0)&&data.guests[0].reward==52,"Aya recommendation increases tea revenue");
+        Assert(Serve(0,0)&&data.guests[0].reward==52+DishBonus(0),"Aya recommendation stacks with daily recommendation");
         Assert(PerfectStart==.48f&&PerfectEnd==.85f,"Nitori heater widens perfect zone");
         int bambooBefore=data.bamboo;NextDay();Assert(data.bamboo==bambooBefore+2,"Momiji delivers daily bamboo");
         Save(false);Load(System.IO.Path.Combine(qaDir,"qa-save.json"));

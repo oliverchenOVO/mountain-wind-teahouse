@@ -82,7 +82,7 @@ public partial class MountainTeaGame
     string ReportSummary()
     {
         NormalizePlanning();int best=0;for(int d=1;d<DishNames.Length;d++)if(data.sales[d]>data.sales[best])best=d;
-        return "第 "+data.reportDay+" 天 · 接待 "+data.served+" 位／離席 "+data.lost+" 位\n營業收入 "+data.nightIncome+" 文（小費與加價 "+data.nightTips+" 文）\n"+(data.nightIncome>0?"熱門餐點："+DishNames[best]+" · "+data.sales[best]+" 份":"今天尚未售出餐點")+"\n收益已在結帳時入帳，不會重複發放。";
+        return "第 "+data.reportDay+" 天 · 接待 "+data.served+" 位／離席 "+data.lost+" 位\n營業收入 "+data.nightIncome+" 文（小費與加價 "+data.nightTips+" 文）\n其中今日推薦加價："+data.nightSpecialIncome+" 文（已包含在收入內）\n"+(data.nightIncome>0?"熱門餐點："+DishNames[best]+" · "+data.sales[best]+" 份":"今天尚未售出餐點")+"\n收益已在結帳時入帳，不會重複發放。";
     }
     void FinishNightReport(){data.reportDay=data.day;Say("今晚的營業紀錄",ReportSummary());Save(false);}
     void DrawPlanning()
@@ -93,18 +93,19 @@ public partial class MountainTeaGame
         for(int t=0;t<4;t++)if(Button(190+t*265,183,250,new[]{"每日菜單","庭院裝修","營業結算","七日手帖"}[t]))planningTab=t;
         if(planningTab==0)
         {
-            Text(190,242,1050,36,data.night?"今晚菜單已鎖定；可備餐補貨，明天再調整。":"勾選今晚供應的餐點。目標數量只是備餐提醒，不會自動扣材料。",small);
+            Text(190,237,1050,74,SpecialSummary()+"　"+(data.night?"今晚菜單已鎖定":"目標數量只作提醒，不自動扣材料"),small);
             for(int d=0;d<DishNames.Length;d++)
             {
-                float y=291+d*56;bool unlocked=RecipeUnlocked(d);
-                Text(190,y,235,32,DishNames[d],heading);Text(430,y,250,55,unlocked?Recipes[d]+"\n售價 "+Prices[d]+" 文 · 庫存 "+Stock(d):d>=5?"首次送達巡山便當解鎖":"完成"+(d==3?"荷取":"文")+"故事第一段解鎖",small);
+                float y=320+d*52;bool unlocked=RecipeUnlocked(d);
+                Text(190,y,235,32,DishNames[d]+(d==DailyDish()?" ★":""),heading);Text(430,y,250,52,unlocked?Recipes[d]+"\n售價 "+Prices[d]+" 文 · 庫存 "+Stock(d):d>=5?"首次送達巡山便當解鎖":"完成"+(d==3?"荷取":"文")+"故事第一段解鎖",small);
                 if(Button(705,y,135,OnMenu(d)?"供應 ✓":"不上架",!data.night&&unlocked))SetMenu(d,!data.menu[d]);
                 Text(860,y+8,110,30,"目標 "+data.prepTargets[d],small);
                 if(Button(968,y,45,"−",!data.night)){data.prepTargets[d]=Mathf.Max(0,data.prepTargets[d]-1);Save(false);}
                 if(Button(1018,y,45,"＋",!data.night)){data.prepTargets[d]=Mathf.Min(20,data.prepTargets[d]+1);Save(false);}
                 if(Button(1080,y,160,"製作",unlocked&&NearTea()&&!data.holding)){planning=false;BeginBrew(d);}
             }
-            Text(190,710,1050,35,"只計算上架料理：目前 "+MenuStock()+" 份，至少 3 份才能開店。客人會從菜單點餐。",small);
+            Text(190,690,1050,28,"上架料理 "+MenuStock()+" 份（至少 3 份開店）。推薦可不上架，客人只點菜單內料理。",small);
+            Text(190,718,1050,28,"常見口味：文喜歡清茶 · 荷取喜歡菇飯 · 椛喜歡鹽燒。今晚以客人的實際點單為準。",small);
             if(Button(190,750,340,"儲存備餐計畫"))Save();
             if(Button(550,750,340,"開店",!data.night&&NearTea()&&MenuStock()>=3)){planning=false;OpenShop();}
         }
@@ -125,15 +126,15 @@ public partial class MountainTeaGame
         else if(planningTab==3)DrawTeaWeek();
         else
         {
-            Text(190,255,1000,125,data.reportDay==0?"第一次營業後，這裡會留下完整結算。":ReportSummary(),body);
-            for(int d=0;d<DishNames.Length;d++)Text(190,405+d*36,800,35,DishNames[d]+"　售出 "+data.sales[d]+" 份",small);
-            Text(190,680,1000,60,"下一個裝修目標：入口盆栽 35 文／庭院燈籠 45 文\n提前休息也會結算已送出的餐點，未送出的托盤會退回。",small);
+            Text(190,255,1000,175,data.reportDay==0?"第一次營業後，這裡會留下完整結算。":ReportSummary(),body);
+            for(int d=0;d<DishNames.Length;d++)Text(190,440+d*36,800,35,DishNames[d]+"　售出 "+data.sales[d]+" 份",small);
+            Text(190,710,1000,60,"下一個裝修目標：入口盆栽 35 文／庭院燈籠 45 文\n提前休息也會結算已送出的餐點，未送出的托盤會退回。",small);
         }
     }
     void DrawCompactGuests()
     {
         if(data.guests.Count==0)return;guestTarget=Mathf.Clamp(guestTarget,0,data.guests.Count-1);
-        Panel(new Rect(1065,205,350,415));Text(1080,216,320,35,"客人 · 第 "+(data.wave+1)+" 輪",heading);
+        Panel(new Rect(1065,205,350,485));Text(1080,216,320,35,"客人 · 第 "+(data.wave+1)+" 輪",heading);
         for(int i=0;i<data.guests.Count;i++)
         {
             var g=data.guests[i];float y=261+i*68;Portrait(g.name,new Rect(1080,y,36,44));
@@ -143,7 +144,8 @@ public partial class MountainTeaGame
             Box(new Rect(1125,y+56,265*Mathf.Clamp01(g.patience/100),3),gold);
         }
         bool near=NearTea()&&!modal&&!data.holding&&data.guests[guestTarget].state==1;
-        for(int d=0;d<DishNames.Length;d++)if(Button(1080+d%3*108,478+d/3*46,102,ShortDishes[d]+" "+Stock(d),near&&OnMenu(d)&&Stock(d)>0))PickTray(guestTarget,d);
+        for(int d=0;d<DishNames.Length;d++)if(Button(1080+d%3*108,478+d/3*46,102,ServingLabels[d]+" "+Stock(d),near&&OnMenu(d)&&Stock(d)>0))PickTray(guestTarget,d);
+        Text(1080,622,320,60,GuestTasteHint(data.guests[guestTarget]),small);
     }
     void DrawTableOrders()
     {
