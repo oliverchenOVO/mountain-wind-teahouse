@@ -1,10 +1,18 @@
-# 山風茶屋 — Windows 可玩 Demo 0.25
+# 山風茶屋 — Windows 可玩 Demo 0.26
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV25/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV25 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV26/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV26 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.26 營業可讀性
+
+- 客人清單、桌邊紙籤、端盤消息與送餐動作卡使用相同的 1／2／3 號桌，沿用原有桌位與客人順序。
+- 等候中的客人依剩餘耐心顯示「從容準備／留意時間／久候了」；用餐、餐後對話與離席有獨立文字，不再一直顯示等待條。文字與顏色並用，不只靠顏色辨認。
+- 端盤後突出真正的送餐桌位，顯示「等待暫停」與桌邊 E 提示；不能改送其他桌。原有端盤期間該客人不減耐心的規則不變，其他客人照常等待。
+- 料理按鈕上方顯示要端給哪一桌、是否需要走近料理台；端盤時改為原有的「放回料理台」按鈕，放回才退庫存，不自動製作或付款。
+- 不改價格、耐心速度、送餐 2.6 m 距離、角色故事、存檔格式或兩輪營業流程。
 
 ## 0.25 操作便利
 
@@ -165,7 +173,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV25/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV26/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 

@@ -38,7 +38,7 @@ public partial class MountainTeaGame
         if(data.holding||data.lunchState==2||!OnMenu(dish)||guest<0||guest>=data.guests.Count||data.guests[guest].state!=1||data.guests[guest].done||Stock(dish)<1)return false;
         data.holding=true;data.heldGuest=guest;data.heldDish=dish;data.heldPerfect=Quality(dish)>0;
         ChangeStock(dish,-1);if(data.heldPerfect)ChangeQuality(dish,-1);
-        playerMotion.Carrying=true;Notify("端著"+DishNames[dish]+"，走到"+data.guests[guest].name+"桌邊按 E。",6);Save(false);return true;
+        playerMotion.Carrying=true;Notify("端著"+DishNames[dish]+"，送往"+TableName(guest)+" · "+data.guests[guest].name+"，桌邊按 E。",6);Save(false);return true;
     }
     bool DeliverTray(bool test=false)
     {
@@ -110,11 +110,7 @@ public partial class MountainTeaGame
     void DrawCafeOverlay()
     {
         DrawCookingLife();
-        if(data.holding&&!modal&&!notebook&&!paused&&!relationships&&!planning)
-        {
-            // The context card and ground ring identify the actual delivery target.
-            if(Button(960,760,455,"放回料理台",Vector3.Distance(player.position,new Vector3(-12,0,-2.2f))<4))ReturnTray();
-        }
+        // Tray return now sits inside the numbered service panel with the same proximity rule.
         if(!brewing)return;
         Box(new Rect(0,0,1440,900),new Color(0,0,0,.3f));Panel(new Rect(420,490,600,290));DrawCookingIllustration();
         Text(450,603,540,32,"料理火候 · "+DishNames[brewDish],body);

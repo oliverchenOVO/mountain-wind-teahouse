@@ -29,7 +29,7 @@ public partial class MountainTeaGame
             if(data.heldGuest<0||data.heldGuest>=data.guests.Count)return null;
             var guest=data.guests[data.heldGuest];Vector3 seat=new Vector3(-16+data.heldGuest*3,0,-9.2f);float distance=Vector3.Distance(player.position,seat);
             if(guest.state!=1)return null;
-            return new InteractionCue{category=3,target=seat,ready=distance<=2.6f,action="送出 "+DishNames[data.heldDish],detail="目標："+guest.name+" · 距離 "+distance.ToString("F1")+" m / 2.6 m"};
+            return new InteractionCue{category=3,target=seat,ready=distance<=2.6f,action="送出 "+DishNames[data.heldDish],detail="目標："+TableName(data.heldGuest)+" · "+guest.name+" · "+distance.ToString("F1")+" m / 2.6 m"};
         }
         var s=nearest;if(s==null||!VisibleLivingSpot(s)||Vector3.Distance(player.position,s.pos)>=2.2f)return null;
         if((s.kind<3||s.kind==23||s.kind==24)&&data.harvested.Contains(s.id)||s.kind<3&&data.night)return null;

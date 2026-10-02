@@ -146,29 +146,35 @@ public partial class MountainTeaGame
     void DrawCompactGuests()
     {
         if(data.guests.Count==0)return;guestTarget=Mathf.Clamp(guestTarget,0,data.guests.Count-1);
-        Panel(new Rect(1065,205,350,485));Text(1080,216,320,35,"客人 · 第 "+(data.wave+1)+" 輪",heading);
+        Panel(new Rect(1065,205,350,600));Text(1080,216,320,35,"桌位 · 第 "+(data.wave+1)+" 輪客人",heading);
         for(int i=0;i<data.guests.Count;i++)
         {
-            var g=data.guests[i];float y=261+i*68;Portrait(g.name,new Rect(1080,y,36,44));
-            Text(1125,y,270,27,g.name+(i==guestTarget?" ◀":""),small);
-            Text(1125,y+26,200,30,g.done?"已離席":g.state==0?"入座中":g.state==1?ShortDishes[g.order]:g.state==2?"享用中":g.state==3?"聊天中":"離開中",small);
-            if(g.state==1&&Button(1325,y+12,74,"選擇",!modal&&!data.holding))guestTarget=i;
-            Box(new Rect(1125,y+56,265*Mathf.Clamp01(g.patience/100),3),gold);
+            var g=data.guests[i];float y=261+i*91;bool focused=i==ServiceFocus();
+            if(focused)RoundFill(new Rect(1077,y-3,324,86),new Color(gold.r,gold.g,gold.b,.16f));
+            TeaTag(new Rect(1082,y+2,62,27),(i+1)+" 桌",GuestStatusColor(i));Portrait(g.name,new Rect(1084,y+34,36,40));
+            Text(1155,y,238,27,g.name+(focused?" ◀":""),small);
+            Text(1155,y+25,237,26,GuestStatus(i),small);
+            Text(1130,y+51,183,27,WaitingGuest(g)?"想吃 "+ShortDishes[g.order]:g.state==2||g.state==3?"餐點 "+ShortDishes[g.dish]:"",small);
+            if(WaitingGuest(g)&&TeaButton(new Rect(1320,y+51,78,28),TrayTarget(i)?"目標":"選桌",!data.holding&&!modal,focused?sage:ink))ChooseServiceGuest(i);
+            if(WaitingGuest(g)){RoundFill(new Rect(1130,y+81,265,4),new Color(.8f,.81f,.71f));RoundFill(new Rect(1130,y+81,265*Mathf.Clamp01(g.patience/100),4),GuestStatusColor(i));}
         }
         bool near=NearTea()&&!modal&&!data.holding&&data.guests[guestTarget].state==1;
-        for(int d=0;d<DishNames.Length;d++)if(Button(1080+d%3*108,478+d/3*46,102,ServingLabels[d]+" "+Stock(d),near&&OnMenu(d)&&Stock(d)>0))PickTray(guestTarget,d);
-        Text(1080,622,320,60,GuestTasteHint(data.guests[guestTarget]),small);
+        Text(1080,541,320,58,ServiceActionHint(),small);
+        if(data.holding){if(Button(1080,604,318,"放回料理台",Vector3.Distance(player.position,new Vector3(-12,0,-2.2f))<4&&!modal))ReturnTray();Text(1080,660,318,64,"送餐途中不能更換桌位。\n回料理台可放回托盤，料理會退回庫存。",small);}
+        else for(int d=0;d<DishNames.Length;d++)if(Button(1080+d%3*108,604+d/3*46,102,ServingLabels[d]+" "+Stock(d),near&&OnMenu(d)&&Stock(d)>0))PickTray(guestTarget,d);
+        int focus=ServiceFocus();if(focus>=0&&focus<data.guests.Count)Text(1080,743,320,60,GuestTasteHint(data.guests[focus]),small);
     }
     void DrawTableOrders()
     {
         if(!data.night)return;
         for(int i=0;i<data.guests.Count;i++)
         {
-            var g=data.guests[i];if(g.done||g.state!=1)continue;
+            var g=data.guests[i];if(g.done||g.state==5)continue;
             Vector3 p=cam.WorldToViewportPoint(new Vector3(-16+i*3,2.5f,-9.2f));float x=p.x*1440,y=(1-p.y)*900;
             if(x<50||x>1010||y<135||y>680)continue;
             bool target=data.holding&&data.heldGuest==i;bool ready=Vector3.Distance(player.position,new Vector3(-16+i*3,0,-9.2f))<=2.6f;
-            Box(new Rect(x-68,y-28,136,30),sage);Text(x-60,y-26,125,30,(target?(ready?"[E] 送餐":"走近送餐"):ShortDishes[g.order]),label);
+            TeaTag(new Rect(x-65,y-30,130,27),(i+1)+"桌 · "+(target?"送餐目標":g.state==1?ShortDishes[g.order]:g.state==0?"入座中":g.state==2?"享用中":g.state==3?"餐後聊聊":"離開中"),GuestStatusColor(i));
+            if(target)TeaTag(new Rect(x-65,y,130,26),ready?"[E] 送餐":"走近這一桌",ink);
         }
     }
     void TestTeaPlanning()

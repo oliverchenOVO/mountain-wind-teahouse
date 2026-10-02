@@ -500,7 +500,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.25",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.26",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -759,7 +759,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();TestServiceReadability();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -974,6 +974,18 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);planning=false;SelectTravelTab(1);travelBook=true;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"93-convenience-travel-tab.png"));
         yield return new WaitForSeconds(.5f);travelBook=false;
+        NewGame();modal=false;data.tea=8;data.meal=5;data.grilled=4;player.position=new Vector3(-12,0,-3);cam.transform.position=player.position+CameraOffset;OpenShop();toastTimer=0;
+        yield return new WaitForSeconds(5);data.guests[0].patience=80;data.guests[1].patience=45;data.guests[2].patience=20;ChooseServiceGuest(2);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"94-service-waiting.png"));
+        yield return new WaitForSeconds(.5f);PickTray(2,data.guests[2].order);player.position=new Vector3(-13,0,-6);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"95-service-tray-target.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"96-service-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);player.position=new Vector3(-10,0,-9.2f);cam.transform.position=player.position+CameraOffset;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"97-service-delivery-ready.png"));
+        yield return new WaitForSeconds(.5f);DeliverTray();toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"98-service-dining.png"));
+        yield return new WaitForSeconds(.5f);ReturnMenu();NewGame();modal=false;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
