@@ -1,10 +1,18 @@
-# 山風茶屋 — Windows 可玩 Demo 0.26
+# 山風茶屋 — Windows 可玩 Demo 0.27
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV26/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV26 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV27/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV27 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.27 茶屋夜景
+
+- 開始營業後約一秒漸變至冷藍山夜背景與月色補光，屋簷燈籠、料理台與三張客桌保留柔和暖光；晴夜與雨夜各有色調，不改天氣排程或營業時間。
+- 三張桌子各有小紙燈，沿用桌位、料理盤與客人位置；燈紙低光澤並有暖色自發光，日間不亮起桌燈或燈暈。
+- 五個快取柔邊燈暈、六盞範圍受限且不投影的照明，不新增粒子系統，也不在每幀建立幾何或材質。原有料理火光、花園裝修燈與螢火蟲仍保留各自流程。
+- 微弱燈光起伏在對話、手帳與暫停時凍結；拍照模式保留夜景。回選單、讀檔與隔日恢復／重建暫時光線，不新增存檔欄位或消耗。
+- 角色、桌號、地面送餐環與 E 提示沿用 0.26；不增加碰撞、不改收入、耐心速度、材料或送餐距離。
 
 ## 0.26 營業可讀性
 
@@ -173,7 +181,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV26/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV27/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 

@@ -5,10 +5,9 @@ using System.Collections.Generic;
 public class ValleyAtmosphere : MonoBehaviour
 {
     public bool Evening;
-    List<Light> lanterns=new List<Light>();ParticleSystem fireflies;static Material mist;
+    ParticleSystem fireflies;static Material mist;
     public void Build()
     {
-        foreach(var l in FindObjectsByType<Light>(FindObjectsSortMode.None))if(l.type==LightType.Point)lanterns.Add(l);
         var m=new Material(Resources.Load<Shader>("Shaders/SoftParticle"));
         var tex=new Texture2D(32,32,TextureFormat.RGBA32,false);var pixels=new Color[1024];
         for(int y=0;y<32;y++)for(int x=0;x<32;x++){float d=Vector2.Distance(new Vector2(x,y),new Vector2(15.5f,15.5f))/15.5f;pixels[y*32+x]=new Color(1,1,1,Mathf.Pow(Mathf.Clamp01(1-d),2));}
@@ -49,7 +48,6 @@ public class ValleyAtmosphere : MonoBehaviour
     }
     void Update()
     {
-        foreach(var l in lanterns)if(l)l.intensity=(Evening?3.2f:.8f)+Mathf.Sin(Time.time*2+l.transform.position.x)*.07f;
         if(fireflies){if(Evening&&!fireflies.isPlaying)fireflies.Play();else if(!Evening&&fireflies.isPlaying)fireflies.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);}
     }
     public static void Meal(int slot,int dish)

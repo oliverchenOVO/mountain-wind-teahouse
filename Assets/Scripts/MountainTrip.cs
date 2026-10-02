@@ -133,6 +133,7 @@ public partial class MountainTeaGame
     void LateUpdate()
     {
         TickRainWeather(Time.deltaTime);
+        TickTeaNightScene(Time.deltaTime);
         SyncSupplyCart();
         TickTeaLife(Time.deltaTime);
         TickLivingMountain(Time.deltaTime);UpdateMountainAudio(Time.deltaTime);UpdateInteractionMarker();

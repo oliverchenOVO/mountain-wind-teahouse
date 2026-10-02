@@ -104,6 +104,7 @@ public partial class MountainTeaGame : MonoBehaviour
         BuildCanopyViews();
         BuildTeaRoofView();
         BuildCookingLife();
+        BuildTeaNightScene();
         CreatePortraits();
         LoadAudioPreferences();
         if(qa) StartCoroutine(QARun());
@@ -436,6 +437,7 @@ public partial class MountainTeaGame : MonoBehaviour
         ResetAmbientTalking();
         RestoreTeaRoofView();
         ResetCookingLife();
+        ResetTeaNightScene();
         if(visitorRoot)foreach(Transform guest in visitorRoot)Destroy(guest.gameObject);visitors.Clear();ValleyAtmosphere.ClearMeals();
         trial=false;fishing=false;paused=false;notebook=false;modal=false;result=false;nearest=null;duskNotified=false;brewing=false;storyGuest=-1;relationships=false;eventFriend=-1;AvatarMotion.Frozen=false;if(playerMotion)playerMotion.Carrying=false;
         foreach(var b in bullets)Destroy(b.visual);bullets.Clear();
@@ -500,7 +502,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.26",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.27",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -759,7 +761,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();TestServiceReadability();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();TestContextGuide();TestUpgradeArt();TestLifeActions();TestFestival();TestSupplies();TestLedger();TestCanopyViews();TestInteractionFeedback();TestCookingLife();TestTeaRoofView();TestParticleCulling();TestFamiliarChats();TestPlanningConvenience();TestServiceReadability();TestTeaNightScene();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -986,6 +988,20 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);DeliverTray();toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"98-service-dining.png"));
         yield return new WaitForSeconds(.5f);ReturnMenu();NewGame();modal=false;
+        player.position=new Vector3(-12,0,-6);cam.transform.position=player.position+CameraOffset;data.tea=8;data.meal=5;data.grilled=4;toastTimer=0;
+        yield return new WaitForSeconds(1);photoMode=true;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"99-night-day-baseline.png"));
+        yield return new WaitForSeconds(.5f);OpenShop();toastTimer=0;
+        yield return new WaitForSeconds(5);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"100-night-sunny-scene.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;toastTimer=0;PickTray(1,data.guests[1].order);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"101-night-service.png"));
+        yield return new WaitForSeconds(.5f);data.day=3;SyncWeatherPeople();photoMode=true;toastTimer=0;
+        yield return new WaitForSeconds(2);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"102-night-rain-scene.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"103-night-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);ReturnTray();NextDay();modal=false;photoMode=true;toastTimer=0;
+        yield return new WaitForSeconds(2);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"104-night-next-morning.png"));
+        yield return new WaitForSeconds(.5f);photoMode=false;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);
