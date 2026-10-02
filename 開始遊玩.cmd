@@ -1,2 +1,2 @@
 @echo off
-start "" "%~dp0Builds\WindowsV12\MountainTea.exe"
+start "" "%~dp0Builds\WindowsV13\MountainTea.exe"

@@ -1,10 +1,19 @@
-# 山風茶屋 — Windows 可玩 Demo 0.12
+# 山風茶屋 — Windows 可玩 Demo 0.13
 
 東方 Project 非官方二次創作。原作：上海アリス幻樂団 / ZUN。
 
 ## 開始遊玩
 
-雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV12/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV12 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+雙擊根目錄的 `開始遊玩.cmd`，或開啟 `Builds/WindowsV13/MountainTea.exe`。選擇「繼續旅程」會讀取原有進度；第一次玩則選「開始新旅程」。整個 WindowsV13 資料夾須保留，不能只移動 exe。舊版均保留供比較。
+
+## 0.13 茶屋便利升級
+
+- 茶屋計畫新增第五頁「茶屋升級」，兩張紙卡明示價格、永久效果與限制。白天回料理台附近購買；營業、端著托盤／便當或操作其他互動時不能購買，不收維護費。
+- 「舒心坐墊」150 文：候餐耐心每秒下降由 0.4 降至 0.3（減少 25%）。購買後立即適用於全部等待中的客人；不增加小費或改動享用、聊天時間。目前是系統效果，不更換庭院坐墊外觀。
+- 「備餐手冊」120 文：每日菜單新增「備 N 份」，一次製作最多五份，最多補到設定目標。僅製作已解鎖且上架的料理，每份依原食譜扣材料；材料不足時只製作能做出的份數。
+- 批次料理都是一般品質，原有精品庫存不會被覆蓋；按「火候」仍可手動製作精品。每份成功製作也會計入七日手帖，不自動開店或送餐。
+- 已達目標、未上架、未解鎖、夜晚營業、遠離茶屋、端著料理或便當時不會批次製作。新旅程與舊存檔預設未購買，已購買狀態跨日及存讀保留，不可重複扣款。
+- 庭院裝修仍為外觀選擇；便利升級不計入七日手帖的庭院裝修目標。保留原存檔 version=1、材料 ID 與既有料理價格。
 
 ## 0.12 推薦餐點與客人口味
 
@@ -53,7 +62,7 @@
 
 私人倉庫：`oliverchenOVO/mountain-wind-teahouse`。提交包含 Assets（含 Unity .meta）、Packages、ProjectSettings、Blender 原始模型與工具；不包含快取、玩家存檔、QA 資料或 Windows 執行檔。
 
-Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV12/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
+Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Windows Build Support，再執行下方建置命令產生 `Builds/WindowsV13/`。根目錄啟動器只適用於已建置的本機副本。尚未上傳 GitHub Release 或建立自動建置。
 
 ## 0.7 山中日常與遺失筆記
 
@@ -183,6 +192,7 @@ Git clone 後用 Unity Hub 開啟本資料夾，安裝相同 Unity 版本與 Win
 - `Assets/Scripts/TeaLifeArt.cs`：0.10 茶屋擺設、紙傘、屋簷水滴與動態肖像控制。
 - `Assets/Scripts/TeaWeek.cs`：0.11 七日手帖、可補做目標、一次性謝禮與兼容測試。
 - `Assets/Scripts/DailySpecial.cs`：0.12 固定每日推薦、客人口味提示、加價與兼容測試。
+- `Assets/Scripts/TeaUpgrades.cs`：0.13 一次性便利升級、候餐速度、批次備餐與兼容測試。
 - `Assets/Scripts/AvatarExpression.cs`：0.10 分離網格眨眼、微笑與頭部小動作。
 - `Assets/Scripts/TeaHouseWorld.cs`：程序生成的溪谷、茶屋、森林、橋梁和場景材質。
 - `Assets/Scripts/MountainArt.cs`：0.2 的地形、茶屋、森林與環境細節。

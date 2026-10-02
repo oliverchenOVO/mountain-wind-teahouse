@@ -90,7 +90,7 @@ public partial class MountainTeaGame
         Box(new Rect(0,0,1440,900),new Color(0,0,0,.4f));Panel(new Rect(155,105,1130,695));
         Text(190,126,700,40,"茶屋計畫 · "+data.money+" 文",heading);
         if(Button(1080,125,170,"收起 [Esc]")){Save(false);planning=false;}
-        for(int t=0;t<4;t++)if(Button(190+t*265,183,250,new[]{"每日菜單","庭院裝修","營業結算","七日手帖"}[t]))planningTab=t;
+        for(int t=0;t<5;t++)if(Button(190+t*212,183,200,new[]{"每日菜單","庭院裝修","營業結算","七日手帖","茶屋升級"}[t]))planningTab=t;
         if(planningTab==0)
         {
             Text(190,237,1050,74,SpecialSummary()+"　"+(data.night?"今晚菜單已鎖定":"目標數量只作提醒，不自動扣材料"),small);
@@ -102,7 +102,8 @@ public partial class MountainTeaGame
                 Text(860,y+8,110,30,"目標 "+data.prepTargets[d],small);
                 if(Button(968,y,45,"−",!data.night)){data.prepTargets[d]=Mathf.Max(0,data.prepTargets[d]-1);Save(false);}
                 if(Button(1018,y,45,"＋",!data.night)){data.prepTargets[d]=Mathf.Min(20,data.prepTargets[d]+1);Save(false);}
-                if(Button(1080,y,160,"製作",unlocked&&NearTea()&&!data.holding)){planning=false;BeginBrew(d);}
+                if(Button(1080,y,data.prepUpgrade?76:160,data.prepUpgrade?"火候":"製作",unlocked&&NearTea()&&!data.holding)){planning=false;BeginBrew(d);}
+                if(data.prepUpgrade&&Button(1163,y,80,"備"+BatchCount(d)+"份",CanImprove()&&BatchCount(d)>0))MakeBatch(d);
             }
             Text(190,690,1050,28,"上架料理 "+MenuStock()+" 份（至少 3 份開店）。推薦可不上架，客人只點菜單內料理。",small);
             Text(190,718,1050,28,"常見口味：文喜歡清茶 · 荷取喜歡菇飯 · 椛喜歡鹽燒。今晚以客人的實際點單為準。",small);
@@ -124,6 +125,7 @@ public partial class MountainTeaGame
             Text(190,740,1050,35,"裝修為外觀選擇，不收維護費，也不影響角色故事。",small);
         }
         else if(planningTab==3)DrawTeaWeek();
+        else if(planningTab==4)DrawTeaUpgrades();
         else
         {
             Text(190,255,1000,175,data.reportDay==0?"第一次營業後，這裡會留下完整結算。":ReportSummary(),body);

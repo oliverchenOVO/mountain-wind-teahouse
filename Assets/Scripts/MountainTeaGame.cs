@@ -21,6 +21,7 @@ public partial class MountainTeaGame : MonoBehaviour
         public int rainStoryStage;
         public int weekStartDay,weekHarvest,weekCraft,weekServed;public bool[] weekClaimed;
         public int specialDay,specialDish,nightSpecialIncome;
+        public bool comfortUpgrade,prepUpgrade;
         public bool[] menu;public int[] prepTargets,gardenOwned,gardenStyle,sales;
         public List<string> journal=new List<string>();
         public List<Bond> bonds=new List<Bond>();
@@ -482,7 +483,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.12",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.13",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -737,7 +738,7 @@ public partial class MountainTeaGame : MonoBehaviour
             data.guests.Clear();data.night=false;
             TestFriendStories();
             TestTeaPlanning();
-            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();
+            TestMountainTrip();TestLivingMountain();TestRainWeather();TestAudioSettings();TestTeaLife();TestTeaWeek();TestDailySpecial();TestTeaUpgrades();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -815,6 +816,13 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(.5f);Serve(0,0);PayGuest(data.guests[0]);OpenPlanning(2);toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"34-special-report.png"));
         yield return new WaitForSeconds(.5f);planning=false;data.guests.Clear();data.night=false;
+        yield return new WaitForSeconds(.5f);modal=false;result=false;player.position=new Vector3(-12,0,-3);data.money=600;OpenPlanning(4);toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"35-tea-house-upgrades.png"));
+        yield return new WaitForSeconds(.5f);BuyUpgrade(0);BuyUpgrade(1);data.prepTargets[0]=8;data.leaves=14;OpenPlanning();toastTimer=0;
+        yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"36-batch-preparation.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);OpenPlanning(4);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"37-upgrades-small-window.png"));
+        yield return new WaitForSeconds(.5f);Screen.SetResolution(1440,900,FullScreenMode.Windowed);planning=false;
         yield return new WaitForSeconds(.5f);modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

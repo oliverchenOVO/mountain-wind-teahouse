@@ -86,7 +86,7 @@ public partial class MountainTeaGame
             if(g.state==0&&(test||(i<visitors.Count&&visitors[i]&&visitors[i].GetComponent<AvatarMotion>().Seated))){g.state=1;g.stageTime=0;Notify(g.name+"：請給我一份"+DishNames[g.order]+"。");}
             else if(g.state==1)
             {
-                if(!data.holding||data.heldGuest!=i)g.patience-=dt*.4f;
+                if(!data.holding||data.heldGuest!=i)g.patience-=dt*PatienceRate();
                 if(g.patience<=0){g.state=5;g.done=true;data.lost++;ShowVisitors();Save(false);}
             }
             else if(g.state==2&&g.stageTime>=6){g.state=3;g.stageTime=0;}
