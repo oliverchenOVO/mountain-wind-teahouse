@@ -321,6 +321,7 @@ public partial class MountainTeaGame : MonoBehaviour
     }
     public void NextDay()
     {
+        travelDestination=-1;
         ReturnTray();
         if(data.night)foreach(var g in data.guests)if(!g.done){if(g.state>=2)PayGuest(g);else data.lost++;}
         if(data.night){data.reportDay=data.day;}
@@ -440,6 +441,7 @@ public partial class MountainTeaGame : MonoBehaviour
     void OnApplicationPause(bool pause){if(pause)Save(false);}
     void ResetTransient()
     {
+        travelDestination=-1;
         EndTrailRest();
         ResetAmbientTalking();
         RestoreTeaRoofView();
@@ -511,7 +513,7 @@ public partial class MountainTeaGame : MonoBehaviour
         if(!started)
         {
             GUI.enabled=!modal&&!settingsOpen;
-            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.32",small);TeaSeal(new Rect(510,213,64,64));
+            Panel(new Rect(70,80,565,740));Text(110,143,470,40,"妖怪之山  /  休閒冒險 DEMO 0.33",small);TeaSeal(new Rect(510,213,64,64));
             Text(105,205,495,90,"山風茶屋",title);Text(110,300,470,55,"妖怪之山的日常，從一杯茶開始。",heading);
             Text(110,383,455,100,"走進河童溪谷，採集、釣魚、準備晚餐。\n在傍晚的茶香裡，聽天狗說說山中的故事。",body);
             if(Button(110,515,455,"開始新旅程"))
@@ -774,6 +776,7 @@ public partial class MountainTeaGame : MonoBehaviour
             TestPavilionRoofViews();
             TestTrailRestActions();
             TestTravelMap();
+            TestTravelDestinations();
             Debug.Log("QA GAMEPLAY PASS: forage, collisions, quest, fishing, crafting, two service waves, restoration, day reset, save, trial.");
         }
         catch(Exception e){Debug.LogError("QA FAIL: "+e);File.WriteAllText(Path.Combine(qaDir,"FAILED.txt"),e.ToString());Application.Quit(1);yield break;}
@@ -1089,6 +1092,28 @@ public partial class MountainTeaGame : MonoBehaviour
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"138-map-original-notebook-tab.png"));
         yield return new WaitForSeconds(.5f);SelectTravelTab(0);Save(false);Load(Path.Combine(qaDir,"qa-save.json"));modal=false;travelBook=true;toastTimer=0;
         yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"139-map-after-load.png"));
+        yield return new WaitForSeconds(.5f);
+        SelectTravelDestination(0);player.position=TP(98,2);cam.transform.position=player.position+CameraOffset;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"140-destination-map.png"));
+        yield return new WaitForSeconds(.5f);
+        travelBook=false;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"141-destination-guide.png"));
+        yield return new WaitForSeconds(.5f);
+        SelectTravelDestination(2);player.position=restBenchSpots[0].pos;cam.transform.position=player.position+CameraOffset;nearest=SelectNearestSpot();
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"142-destination-arrival.png"));
+        yield return new WaitForSeconds(.5f);
+        travelBook=true;Screen.SetResolution(1024,768,FullScreenMode.Windowed);
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"143-destination-small.png"));
+        yield return new WaitForSeconds(.5f);
+        Screen.SetResolution(1440,900,FullScreenMode.Windowed);travelDestination=-1;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"144-destination-cancel.png"));
+        yield return new WaitForSeconds(.5f);
+        travelBook=false;ChangeRegion(false);SelectTravelDestination(1);travelBook=true;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"145-destination-valley.png"));
+        yield return new WaitForSeconds(.5f);
+        Save(false);Load(Path.Combine(qaDir,"qa-save.json"));modal=false;travelBook=true;toastTimer=0;
+        yield return new WaitForSeconds(1);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"146-destination-after-load.png"));
+        yield return new WaitForSeconds(.5f);
         yield return new WaitForSeconds(.5f);travelBook=false;ChangeRegion(false);photoMode=false;cam.orthographicSize=11.5f;modal=false;paused=true;settingsOpen=true;toastTimer=0;
         yield return new WaitForSeconds(.5f);ScreenCapture.CaptureScreenshot(Path.Combine(qaDir,"27-audio-settings.png"));
         yield return new WaitForSeconds(.5f);Screen.SetResolution(1024,768,FullScreenMode.Windowed);

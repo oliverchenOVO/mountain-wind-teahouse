@@ -87,6 +87,7 @@ public partial class MountainTeaGame
     bool ChangeRegion(bool mountain)
     {
         if(data.night||data.holding||trial)return false;
+        if(!mountain)travelDestination=-1;
         EndTrailRest();RestorePavilionRoofViews();data.onTrail=mountain;player.position=mountain?TP(82,-12):ValleyGate+Vector3.back;
         cam.transform.position=player.position+CameraOffset;modal=false;nearest=null;travelBook=false;ResetAmbientTalking();
         if(mountain)data.trailVisited=true;SyncTrip();Save(false);Notify(mountain?"瀑布山路 · 山栗與野莓每天更新，便當沒有倒數限制。":"回到河童溪谷，可以備餐與營業了。",6);return true;
@@ -159,8 +160,9 @@ public partial class MountainTeaGame
         if(Button(760,465,435,"在茶屋打包菇飯",data.lunchState==1&&NearTea()&&data.meal>0))PackLunch();
         if(Button(760,517,435,"拆開便當，退回料理",data.lunchState==2&&NearTea()))UnpackLunch();
         Text(760,582,440,95,"發現：\n"+(data.photoVisited?"✓ 文的拍照點  ":"□ 文的拍照點  ")+(data.waterVisited?"✓ 水路":"□ 水路")+"\n"+(data.lookoutVisited?"✓ 瀑布觀景亭":"□ 瀑布觀景亭"),small);
-        Text(210,678,990,28,TravelMapLocation(),small);
-        Text(210,711,990,28,"示意地圖，非自動尋路 · 小橋西側支線通往觀景亭；營業前請先返回茶屋。",small);
+        Text(210,678,820,28,DestinationCaption(),small);
+        if(TeaButton(new Rect(1050,668,145,40),"取消目的地",travelDestination>=0,sage))travelDestination=-1;
+        Text(210,711,990,28,TravelMapLocation()+" · 示意圖非尋路，過河請走小橋。",small);
     }
     void TestMountainTrip()
     {

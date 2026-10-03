@@ -5,7 +5,17 @@ public partial class MountainTeaGame
     static readonly Vector2[] TravelMainRoute={new Vector2(82,-13),new Vector2(90,-6),new Vector2(94,2),new Vector2(102,2),new Vector2(112,10),new Vector2(106,20)};
     static readonly Vector2[] TravelLookoutRoute={new Vector2(94,2),new Vector2(90,2),new Vector2(86,12),new Vector2(86,18.5f)};
     static readonly Vector2[] TravelActorOffsets={new Vector2(18,32),new Vector2(-22,20),new Vector2(-25,-22)};
-    GUIStyle travelMapLabel,travelMapPin;
+    GUIStyle travelMapLabel,travelMapPin,travelPaperButton;
+    int travelDestination=-1;
+    static readonly string[] TravelDestinationNames={"觀景亭","哨所亭","① 長凳","② 長凳","溪谷出口"};
+    Vector3 TravelDestinationPosition(int index)
+    {return index==0?TP(86,21):index==1?TP(106,20):index==2?restBenchSpots[0].pos:index==3?restBenchSpots[1].pos:TrailStart;}
+    bool SelectTravelDestination(int index)
+    {if(index<0||index>=TravelDestinationNames.Length)return false;travelDestination=index;return true;}
+    GuideStep DestinationGuide()
+    {return GuideTo("destination","散步 · "+TravelDestinationNames[travelDestination],"沿山路與小橋前往，不必走直線。\n旅行手帳可更換或取消目的地。",TravelDestinationPosition(travelDestination),2);}
+    string DestinationCaption()
+    {return travelDestination<0?"點下方紙籤選目的地 · 不傳送、不自動尋路":TravelDestinationNames[travelDestination]+" · "+(data.onTrail?GuideDirection(DestinationGuide()):"先到溪谷東北入口按 E 上山");}
     static Vector2 TravelMapPoint(Rect plot,Vector3 world)
     {return new Vector2(plot.x+(world.x-77)/42*plot.width,plot.y+(25-world.z)/41*plot.height);}
     static bool TravelMapContains(Vector3 world)
@@ -37,10 +47,10 @@ public partial class MountainTeaGame
     }
     void DrawTravelMap()
     {
-        if(travelMapLabel==null){travelMapLabel=Style(16,FontStyle.Normal,ink);travelMapPin=Style(14,FontStyle.Bold,cream);travelMapPin.alignment=TextAnchor.MiddleCenter;}
+        if(travelMapLabel==null){travelMapLabel=Style(16,FontStyle.Normal,ink);travelMapPin=Style(14,FontStyle.Bold,cream);travelMapPin.alignment=TextAnchor.MiddleCenter;travelPaperButton=new GUIStyle(button){fontSize=16,border=new RectOffset(12,12,12,12),padding=new RectOffset(4,4,0,0)};}
         Rect card=new Rect(210,250,490,415),plot=new Rect(230,290,450,310);
         RoundFill(card,new Color(.56f,.63f,.47f));RoundFill(new Rect(214,254,482,407),new Color(.88f,.88f,.73f));
-        Text(230,260,300,27,"山路散步圖",small);Text(610,262,72,24,"↑ 北",small);
+        Text(230,260,365,27,"散步圖 · A 文  N 荷取  M 椛",travelMapLabel);Text(610,262,72,24,"↑ 北",small);
         RoundFill(plot,new Color(.70f,.77f,.59f));
         // Muted forest patches are schematic decoration, not collision or navigation data.
         for(int i=0;i<7;i++){MapDot(new Vector2(plot.x+14,plot.y+26+i*40),12,new Color(.47f,.60f,.43f,.25f));MapDot(new Vector2(plot.xMax-14,plot.y+16+i*40),12,new Color(.47f,.60f,.43f,.25f));}
@@ -57,6 +67,11 @@ public partial class MountainTeaGame
         MapLabel(bridge+new Vector2(-74,-25),"小橋");
         MapLandmark(plot,restBenchSpots[0].pos,"① 長凳",new Vector2(13,-6),true);
         MapLandmark(plot,restBenchSpots[1].pos,"② 長凳",new Vector2(12,5),true);
+        if(travelDestination>=0)
+        {
+            Vector2 target=TravelMapPoint(plot,TravelDestinationPosition(travelDestination));
+            MapDot(target,13,gold);MapDot(target,9,cream);MapDot(target,5,sage);
+        }
         for(int i=0;i<routineKinds.Length;i++)
         {
             var actor=spots.Find(s=>s.kind==routineKinds[i]);if(actor==null||!TravelMapContains(actor.pos))continue;
@@ -71,10 +86,38 @@ public partial class MountainTeaGame
         MapDot(new Vector2(238,616),5,sage);Text(249,605,125,25,"亭／出口",travelMapLabel);
         MapDot(new Vector2(382,616),5,new Color(.66f,.38f,.24f));Text(393,605,85,25,"長凳",travelMapLabel);
         MapDot(new Vector2(495,616),7,gold);MapDot(new Vector2(495,616),3,ink);Text(508,605,170,25,"你的位置",travelMapLabel);
-        Text(230,630,455,25,"A 文   N 荷取   M 椛  ·  友人位置隨日常移動",travelMapLabel);
+        Color paperBefore=GUI.backgroundColor;
+        for(int i=0;i<TravelDestinationNames.Length;i++)
+        {
+            GUI.backgroundColor=travelDestination==i?gold:Color.Lerp(sage,cream,.45f);
+            travelPaperButton.normal.textColor=travelDestination==i?ink:cream;
+            travelPaperButton.hover.textColor=travelDestination==i?ink:cream;
+            travelPaperButton.active.textColor=travelDestination==i?ink:cream;
+            if(GUI.Button(new Rect(222+i*94,630,90,28),TravelDestinationNames[i],travelPaperButton))SelectTravelDestination(i);
+        }
+        GUI.backgroundColor=paperBefore;
     }
     string TravelMapLocation()
     {return data.onTrail?"目前在山路 · X "+player.position.x.ToString("F1")+" / Z "+player.position.z.ToString("F1"):"目前在溪谷 · 山路圖不顯示溪谷位置";}
+    void TestTravelDestinations()
+    {
+        NewGame();modal=false;Assert(travelDestination==-1,"new journey has no temporary destination");
+        string snapshot=JsonUtility.ToJson(data);Vector3 position=player.position;
+        Assert(!SelectTravelDestination(-1)&&!SelectTravelDestination(5)&&travelDestination==-1,"invalid destination cannot change selection");
+        for(int i=0;i<5;i++){Assert(SelectTravelDestination(i)&&TravelMapContains(TravelDestinationPosition(i)),"all destination papers target real mountain coordinates");Assert(DestinationCaption().Contains("先到溪谷"),"valley destination gives gate instructions instead of cross-region distance");}
+        Assert(snapshot==JsonUtility.ToJson(data)&&position==player.position,"destination selection does not spend teleport or change saved progress");
+        SelectTravelDestination(2);ChangeRegion(true);Assert(travelDestination==2&&DestinationGuide().target==restBenchSpots[0].pos,"entering mountain retains chosen bench and its actual interaction position");
+        Assert(CurrentGuide().key=="destination","chosen walk overrides passive mountain guide");
+        player.position=TravelDestinationPosition(2);Assert(DestinationCaption().Contains("附近")&&restSeat==-1,"arrival does not automatically sit or interact");
+        trial=true;Assert(CurrentGuide().key=="trial","trial controls take priority over destination");trial=false;
+        data.lunchState=2;Assert(CurrentGuide().key=="lunch","packed lunch guidance takes priority over optional walk");data.lunchState=0;
+        travelDestination=-1;Assert(CurrentGuide().key!="destination","cancellation restores original guide");
+        SelectTravelDestination(0);Save(false);Load(System.IO.Path.Combine(qaDir,"qa-save.json"));modal=false;Assert(travelDestination==-1&&data.onTrail,"load clears paper without changing saved region");
+        SelectTravelDestination(1);ChangeRegion(false);Assert(travelDestination==-1,"returning valley clears destination");
+        SelectTravelDestination(4);NextDay();modal=false;Assert(travelDestination==-1,"next day clears destination");
+        SelectTravelDestination(3);ReturnMenu();Assert(travelDestination==-1,"title clears temporary destination");NewGame();modal=false;
+        Debug.Log("QA DESTINATION PASS: five targets, validation, readonly selection, valley entry, priority, arrival, cancel, save/load, return, days and title.");
+    }
     void TestTravelMap()
     {
         NewGame();modal=false;var plot=new Rect(230,290,450,310);

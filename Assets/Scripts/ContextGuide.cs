@@ -47,6 +47,7 @@ public partial class MountainTeaGame
         }
         if(data.onTrail)
         {
+            if(travelDestination>=0)return DestinationGuide();
             if(data.notebookStage>=1&&data.notebookStage<=4)
             {var s=GuideSpot(data.notebookStage<4?27+data.notebookStage:22);return GuideTo("clue","巡山筆記",NotebookHint(),s.pos,2);}
             var spot=GuideSpot(data.notebookStage==5||data.lunchState==1?21:25);
