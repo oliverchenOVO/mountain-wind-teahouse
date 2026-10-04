@@ -37,7 +37,11 @@
 
 地圖呈現道路、河道、設施與友人目前位置；目的地紙籤顯示方位與直線距離，保留自行探索的節奏。
 
-[直接播放 86 秒實玩展示影片](https://github.com/oliverchenOVO/mountain-wind-teahouse/issues/1)（GitHub 影片播放器） · [MP4 原始檔](ShowcaseDraft/video/mountain-tea-v033-story-86s.mp4)
+### 86 秒實玩展示影片
+
+https://github.com/user-attachments/assets/e1aa3ac9-beb8-4de9-975f-38f241fa6a65
+
+[備用播放頁](https://github.com/oliverchenOVO/mountain-wind-teahouse/issues/1) · [MP4 原始檔](ShowcaseDraft/video/mountain-tea-v033-story-86s.mp4)
 
 展示順序：鏡頭拉遠展示溪谷全景 → 打開旅行手帳展示完整瀑布山路地圖 → 射命丸文與河城荷取對話 → 煮茶 → 夜間客人互動與送餐。影片剪輯自實際遊戲畫面，使用獨立示範存檔與預備材料，並非連續的新遊戲通關；配樂為遊戲音樂後製加入。
 

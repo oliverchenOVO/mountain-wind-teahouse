@@ -4,6 +4,12 @@
 
 展示版本為 0.33，平台為 Windows。此資料夾供作品展示準備與推甄文字整理，已完成 [86 秒實玩展示影片：直接播放](https://github.com/oliverchenOVO/mountain-wind-teahouse/issues/1)（[MP4 原始檔](video/mountain-tea-v033-story-86s.mp4)），依序展示溪谷鏡頭拉遠、旅行手帳完整瀑布山路地圖、射命丸文與河城荷取對話、煮茶及夜間客人互動與送餐，尚未發佈公開倉庫、個人網站或遊戲下載。原始碼目前維持私人。影片使用獨立示範存檔與預備材料，剪輯自實際遊戲畫面；遊戲音樂後製加入，不是連續的新遊戲通關錄影。
 
+## 86 秒實玩展示影片
+
+https://github.com/user-attachments/assets/e1aa3ac9-beb8-4de9-975f-38f241fa6a65
+
+[備用播放頁](https://github.com/oliverchenOVO/mountain-wind-teahouse/issues/1) · [MP4 原始檔](video/mountain-tea-v033-story-86s.mp4)
+
 ## 實際遊戲畫面
 
 ### 茶屋營業
