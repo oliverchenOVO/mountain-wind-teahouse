@@ -1,0 +1,53 @@
+山風茶屋 — 作品展示與權利保留聲明
+採用日期：2026-10-04
+維護者：oliverchenOVO
+聯絡：https://github.com/oliverchenOVO/mountain-wind-teahouse/issues
+
+1. 作品定位
+本專案用於作品展示、教育審閱與開發歷程記錄，未採用開源授權。
+本聲明不是 MIT、Apache、GPL 或 Creative Commons 授權。
+僅在維護者依法有權處理的範圍內適用，不主張所有內容均由其獨力
+創作，也不主張 AI 協作生成內容必然具有可受保護的著作權。
+
+2. 閱讀與審閱
+歡迎透過本倉庫閱讀作品介紹、查看程式及開發紀錄，並分享倉庫網址。
+維護者可將其有權使用的作品內容放入本人推甄資料及個人網站，
+但仍須遵守原作與第三方權利、平台規範及申請機構的 AI 使用規定。
+本聲明不另行授予下載後修改、重新散布或商業利用的權利。
+
+3. 保留的權利
+除適用法律、GitHub 平台必要權利或第三方授權另有規定外，
+未經相應權利人的書面許可，不授予修改或改作、素材抽取、
+整合至其他專案、鏡像發佈、再散布、販售或其他商業利用權。
+僅聲稱用途為非商業，不代表取得上述許可。
+不得冒稱官方作品，或將本專案冒稱為他人的獨立原創作品。
+
+4. GitHub 與法定例外
+公開倉庫具有 GitHub 使用條款允許的查看、fork 及其他必要平台
+權利；本聲明不否定這些權利，也無法技術上禁止複製。
+適用法律的合理使用、法定例外與不可排除權利仍然適用。
+本聲明不將第三方已授予的權利收回，也不重新授權第三方內容。
+
+5. 二次創作與第三方內容
+本作是東方 Project 非官方二次創作。
+東方 Project 原作：上海アリス幻樂団 / ZUN。
+原作角色與世界觀權利屬原權利人，本專案不宣稱獲得官方個別授權。
+Unity、字型及其他第三方內容依其各自條款處理。
+素材與 AI 協作方式見 ShowcaseDraft/CREDITS.md。
+
+6. Demo 與其他使用
+本聲明不表示已發布遊戲下載，也不另行授予 Demo 再散布許可。
+未來提供執行檔時，應另附適用的試玩條款及第三方聲明。
+圖片引用、影片轉載、修改、商用等超出必要平台權利與法定例外的
+使用，請先聯絡維護者及相關權利人，不因倉庫公開而自動取得許可。
+
+7. 原型限制
+本專案為開發中原型，不保證沒有缺陷或適用於特定用途。
+任何免責僅在適用法律允許的範圍內成立。
+
+參考：
+https://docs.github.com/en/site-policy/github-terms/github-terms-of-service
+https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository
+https://touhou-project.news/guidelines_en/
+
+LICENSE-DRAFT.txt 為先前保留的草案紀錄，不是另一份有效授權。
