@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1120" viewBox="0 0 1200 1120" role="img" aria-labelledby="title desc">
+<title id="title">山風茶屋 · 系統架構</title><desc id="desc">單機 Unity 原型，以一個 MountainTeaGame partial class 整理遊戲功能，共用 SaveData，JSON 本機存檔及程序生成呈現。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#416b58"/></marker></defs>
+<style>text{font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;fill:#213f37}.head{font-size:32px;font-weight:700}.body{font-size:23px}.small{font-size:20px}.title{font-size:42px;font-weight:700}.arrow{fill:none;stroke:#416b58;stroke-width:3;marker-end:url(#arrow)}.optional{stroke-dasharray:7 6}</style>
+<rect width="1200" height="1120" rx="22" fill="#f6f3e8"/>
+<rect x="40" y="40" width="7" height="66" rx="3" fill="#ae8136"/>
+<text class="title" x="68" y="78">山風茶屋 · 系統架構</text>
+<text class="small" x="68" y="118" text-anchor="start">0.33｜依現有程式整理；框內是功能分組，不是獨立服務或資料庫</text>
+<rect x="300" y="151" width="600" height="112" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="324" y="190" text-anchor="start">Unity 執行期與玩家操作</text>
+<text class="body" x="324" y="226" text-anchor="start">Boot / Awake → Update / LateUpdate / OnGUI</text>
+<path class="arrow" d="M600 263 V301"/>
+<rect x="40" y="301" width="1120" height="505" rx="24" fill="#edf0e5" stroke="#91aa98" stroke-width="2"/>
+<text class="head" x="66" y="341" text-anchor="start">MountainTeaGame : MonoBehaviour</text>
+<text class="body" x="66" y="373" text-anchor="start">多個 partial 檔案，編譯後仍是同一個類別；共用欄位與狀態</text>
+<rect x="65" y="400" width="340" height="130" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="89" y="439" text-anchor="start">探索與旅行</text>
+<text class="small" x="89" y="475" text-anchor="start">MountainTrip / LivingMountain</text>
+<text class="small" x="89" y="505" text-anchor="start">TravelMap / TrailRestActions</text>
+<rect x="430" y="400" width="340" height="130" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="454" y="439" text-anchor="start">料理與營業</text>
+<text class="small" x="454" y="475" text-anchor="start">CafeService / CookingLife</text>
+<text class="small" x="454" y="505" text-anchor="start">TeaPlanning / TeaLedger</text>
+<rect x="795" y="400" width="340" height="130" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="819" y="439" text-anchor="start">人物與生活事件</text>
+<text class="small" x="819" y="475" text-anchor="start">MountainStories / FamiliarChats</text>
+<text class="small" x="819" y="505" text-anchor="start">TeaWeek / MountainFestival</text>
+<rect x="65" y="550" width="340" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="89" y="589" text-anchor="start">日夜、天氣與經營</text>
+<text class="small" x="89" y="625" text-anchor="start">RainWeather / TeaUpgrades</text>
+<text class="small" x="89" y="655" text-anchor="start">DailySpecial / MountainSupplies</text>
+<rect x="430" y="550" width="340" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="454" y="589" text-anchor="start">介面與操作引導</text>
+<text class="small" x="454" y="625" text-anchor="start">TeaUITheme / ContextGuide</text>
+<text class="small" x="454" y="655" text-anchor="start">ServiceReadability / OnGUI</text>
+<rect x="795" y="550" width="340" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="819" y="589" text-anchor="start">視線與音訊設定</text>
+<text class="small" x="819" y="625" text-anchor="start">CameraCanopies / TeaRoofView</text>
+<text class="small" x="819" y="655" text-anchor="start">PavilionRoofView / AudioSettings</text>
+<rect x="65" y="697" width="1070" height="82" rx="20" fill="#e0e7d7" stroke="#bdcbbd"/>
+<text class="head" x="89" y="736" text-anchor="start">共用 SaveData：日期、庫存、任務、客人、好感、經營與旅行進度</text>
+<path class="arrow" d="M235 665 V697"/>
+<path class="arrow" d="M600 665 V697"/>
+<path class="arrow" d="M965 665 V697"/>
+<rect x="40" y="865" width="540" height="165" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="64" y="904" text-anchor="start">本機持久化</text>
+<text class="body" x="64" y="940" text-anchor="start">Save / Load + JsonUtility</text>
+<text class="body" x="64" y="970" text-anchor="start">JSON 遊玩進度、備份與資料相容處理</text>
+<text class="body" x="64" y="1000" text-anchor="start">音量設定另存 audio-settings.json</text>
+<rect x="620" y="865" width="540" height="165" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="644" y="904" text-anchor="start">場景與角色呈現</text>
+<text class="body" x="644" y="940" text-anchor="start">MountainArt / TrailArt / TeaHouseWorld</text>
+<text class="body" x="644" y="970" text-anchor="start">Resources 角色 FBX + AvatarMotion</text>
+<text class="body" x="644" y="1000" text-anchor="start">材質、粒子、角色表情與程序合成音訊</text>
+<path class="arrow" d="M310 779 V865"/>
+<text class="small" x="330" y="842" text-anchor="start">保存／載入</text>
+<path class="arrow" d="M1135 600 H1180 V836 H890 V865"/>
+<text class="small" x="900" y="826" text-anchor="start">建立／更新呈現</text>
+<text class="small" x="68" y="1076" text-anchor="start">開發流程：Blender Python → blend / FBX → Unity Resources；BuildDemo → Windows 建置。</text>
+<text class="small" x="68" y="1104" text-anchor="start">QA 斷言與截圖是本機開發驗證；目前沒有伺服器、雲端帳號或資料庫後端。</text>
+</svg>

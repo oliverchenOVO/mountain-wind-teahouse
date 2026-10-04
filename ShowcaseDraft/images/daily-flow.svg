@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1110" viewBox="0 0 1200 1110" role="img" aria-labelledby="title desc">
+<title id="title">山中的一天 · 每日玩法流程</title><desc id="desc">採集與備餐、主動開店、送餐與互動、休息跨日；故事及旅行都是可選活動。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#416b58"/></marker></defs>
+<style>text{font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;fill:#213f37}.head{font-size:32px;font-weight:700}.body{font-size:23px}.small{font-size:20px}.title{font-size:42px;font-weight:700}.arrow{fill:none;stroke:#416b58;stroke-width:3;marker-end:url(#arrow)}.optional{stroke-dasharray:7 6}</style>
+<rect width="1200" height="1110" rx="22" fill="#f6f3e8"/>
+<rect x="40" y="40" width="7" height="66" rx="3" fill="#ae8136"/>
+<text class="title" x="68" y="78">山中的一天 · 每日玩法流程</text>
+<text class="small" x="68" y="118" text-anchor="start">0.33｜建議節奏，不是強制任務順序</text>
+<rect x="190" y="155" width="440" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="214" y="194" text-anchor="start">01  白天探索與採集</text>
+<text class="body" x="214" y="230" text-anchor="start">茶葉、香菇、竹筍與溪魚</text>
+<text class="body" x="214" y="260" text-anchor="start">查看天氣、菜單與備餐目標</text>
+<rect x="190" y="310" width="440" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="214" y="349" text-anchor="start">02  回茶屋煮茶、備餐</text>
+<text class="body" x="214" y="385" text-anchor="start">補足今晚菜單上的料理</text>
+<text class="body" x="214" y="415" text-anchor="start">金色火候區按 Space 完成</text>
+<rect x="190" y="465" width="440" height="115" rx="20" fill="#efe3c9" stroke="#bdcbbd"/>
+<text class="head" x="214" y="504" text-anchor="start">03  主動開店</text>
+<text class="body" x="214" y="540" text-anchor="start">回溪谷茶屋，在料理台開店</text>
+<text class="body" x="214" y="570" text-anchor="start">上架料理至少 3 份才能營業</text>
+<rect x="190" y="620" width="440" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="214" y="659" text-anchor="start">04  夜間桌位送餐</text>
+<text class="body" x="214" y="695" text-anchor="start">看訂單 → 拿托盤 → 走到桌邊</text>
+<text class="body" x="214" y="725" text-anchor="start">按 E 交付餐點</text>
+<rect x="190" y="775" width="440" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="214" y="814" text-anchor="start">05  客人互動與結帳</text>
+<text class="body" x="214" y="850" text-anchor="start">客人用餐後聊天、結帳</text>
+<text class="body" x="214" y="880" text-anchor="start">查看收入與經營成果</text>
+<rect x="190" y="930" width="440" height="115" rx="20" fill="#e3eadf" stroke="#bdcbbd"/>
+<text class="head" x="214" y="969" text-anchor="start">06  回房休息、進入隔日</text>
+<text class="body" x="214" y="1005" text-anchor="start">保留材料、料理、金錢與進度</text>
+<text class="body" x="214" y="1035" text-anchor="start">採集點刷新，回到溪谷茶屋</text>
+<path class="arrow" d="M410 270 V310"/>
+<path class="arrow" d="M410 425 V465"/>
+<path class="arrow" d="M410 580 V620"/>
+<path class="arrow" d="M410 735 V775"/>
+<path class="arrow" d="M410 890 V930"/>
+<path class="arrow" d="M190 987 H125 V210 H190"/>
+<text class="small" x="82" y="612" text-anchor="middle">隔日</text>
+<rect x="700" y="155" width="450" height="320" rx="20" fill="#ecebdf" stroke="#bdcbbd"/>
+<text class="head" x="724" y="194" text-anchor="start">白天可自由插入的活動</text>
+<text class="body" x="724" y="230" text-anchor="start">與文、荷取、椛聊聊近況</text>
+<text class="body" x="724" y="260" text-anchor="start">採集／釣魚、委託與好感故事</text>
+<text class="body" x="724" y="290" text-anchor="start">瀑布山路旅行、巡山便當</text>
+<text class="body" x="724" y="320" text-anchor="start">符卡練習、亭旁長凳歇腳</text>
+<text class="body" x="724" y="350" text-anchor="start">材料雜貨、菜單與庭院升級</text>
+<text class="body" x="724" y="380" text-anchor="start">七日手帖、小祭典與天氣事件</text>
+<path class="arrow optional" d="M630 211 H700"/>
+<path class="arrow optional" d="M700 400 H667 V365 H630"/>
+<rect x="700" y="530" width="450" height="175" rx="20" fill="#efe3c9" stroke="#bdcbbd"/>
+<text class="head" x="724" y="569" text-anchor="start">傍晚不會自動開店</text>
+<text class="body" x="724" y="605" text-anchor="start">可以繼續備餐或自由探索</text>
+<text class="body" x="724" y="635" text-anchor="start">想營業時再主動選擇開店</text>
+<text class="body" x="724" y="665" text-anchor="start">也可跳過營業，直接回房休息</text>
+<rect x="700" y="755" width="450" height="205" rx="20" fill="#ecebdf" stroke="#bdcbbd"/>
+<text class="head" x="724" y="794" text-anchor="start">持續遊玩的目標</text>
+<text class="body" x="724" y="830" text-anchor="start">修繕招牌是 Demo 主要目標</text>
+<text class="body" x="724" y="860" text-anchor="start">完成後仍可繼續山中生活</text>
+<text class="body" x="724" y="890" text-anchor="start">地圖只提示方向，不自動尋路</text>
+<text class="body" x="724" y="920" text-anchor="start">實線：建議循環／虛線：可選活動</text>
+<text class="small" x="68" y="1080" text-anchor="start">採集、交易與跨日等會保存進度；F5 手動存檔。開始新旅程會覆寫目前進度。</text>
+</svg>
